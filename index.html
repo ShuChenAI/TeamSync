@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamSync Network Architecture</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.2.0/github-markdown.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 45px;
+            background-color: #f6f8fa;
+        }
+        .markdown-body {
+            background-color: white;
+            padding: 45px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+        }
+        .mermaid {
+            text-align: center;
+            margin: 20px 0;
+        }
+        @media (max-width: 767px) {
+            body {
+                padding: 15px;
+            }
+            .markdown-body {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="content" class="markdown-body"></div>
+
+    <script>
+        // Initialize mermaid
+        mermaid.initialize({ 
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#2188ff',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#0366d6',
+                lineColor: '#586069',
+                secondaryColor: '#f6f8fa',
+                tertiaryColor: '#fafbfc'
+            }
+        });
+
+        // Load and render markdown content
+        fetch('diagram.md')
+            .then(response => response.text())
+            .then(markdown => {
+                // First, render the markdown
+                const html = marked.parse(markdown);
+                document.getElementById('content').innerHTML = html;
+
+                // Then, find all code blocks with mermaid language
+                const codeBlocks = document.querySelectorAll('pre code.language-mermaid');
+                codeBlocks.forEach((block, index) => {
+                    // Get the mermaid code
+                    const code = block.textContent;
+                    
+                    // Create a div for mermaid to render into
+                    const mermaidDiv = document.createElement('div');
+                    mermaidDiv.className = 'mermaid';
+                    mermaidDiv.textContent = code;
+                    
+                    // Replace the code block with the mermaid div
+                    block.parentElement.parentElement.replaceChild(mermaidDiv, block.parentElement);
+                });
+
+                // Render all mermaid diagrams
+                mermaid.run();
+            })
+            .catch(error => {
+                document.getElementById('content').innerHTML = `
+                    <h1>Error loading content</h1>
+                    <p>Could not load diagram.md. Please make sure the file exists.</p>
+                    <pre>${error}</pre>
+                `;
+            });
+    </script>
+</body>
+</html> 

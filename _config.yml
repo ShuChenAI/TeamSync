@@ -1,0 +1,8 @@
+title: TeamSync Network Architecture
+description: Network communication flow diagrams for TeamSync backend system
+theme: jekyll-theme-minimal
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true 
