@@ -48,9 +48,9 @@ It may take a few minutes for the site to become available.
 ## 🎨 Features
 
 - Beautiful GitHub-styled markdown rendering
-- Interactive Mermaid diagrams
+- Clean Mermaid diagrams with black text
 - Responsive design for mobile and desktop
-- Automatic diagram rendering from markdown
+- Simple, static diagram display
 
 ## 🛠️ Local Development
 

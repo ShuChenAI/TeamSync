@@ -1,71 +1,71 @@
 graph TB
-    subgraph ClientTier["👥 客戶端層"]
+    subgraph ClientTier["👥 客戶端層 - Client Layer"]
         direction LR
-        WebApp["🌐 Web App<br/>Jitsi IFrame"]
-        WebAudio["🎤 Web Audio API"]
+        WebApp["🌐 Web Application<br/>React/Vue + Jitsi IFrame API<br/>視訊會議介面整合"]
+        WebAudio["🎤 Web Audio API<br/>MediaRecorder API<br/>即時音訊串流擷取"]
     end
 
-    subgraph GatewayTier["🚪 API 閘道層"]
+    subgraph GatewayTier["🚪 API 閘道層 - Gateway Layer"]
         direction LR
-        FastAPI["📹 FastAPI:8888"]
-        WSServer["🎙️ WebSocket Server"]
+        FastAPI["📹 FastAPI Server<br/>Port 8888<br/>RESTful API + JWT Auth<br/>會議管理與權限控制"]
+        WSServer["🎙️ WebSocket Server<br/>Socket.io/SignalR<br/>即時雙向通訊<br/>音訊串流處理"]
     end
 
-    subgraph VideoTier["📹 視訊服務層"]
+    subgraph VideoTier["📹 視訊服務層 - Video Conference Layer"]
         direction LR
-        JitsiWeb["🌐 Jitsi Web:443"]
-        Prosody["💬 Prosody:5222"]
-        Jicofo["🎯 Jicofo:8888"]
-        JVB["🎥 JVB:10000"]
+        JitsiWeb["🌐 Jitsi Meet Web<br/>HTTPS Port 443<br/>WebRTC 信令伺服器<br/>會議室管理介面"]
+        Prosody["💬 Prosody XMPP Server<br/>Port 5222/5269<br/>即時訊息路由<br/>使用者狀態管理"]
+        Jicofo["🎯 Jicofo<br/>Port 8888<br/>會議焦點控制器<br/>媒體協商與房間管理"]
+        JVB["🎥 Jitsi Videobridge<br/>UDP Port 10000<br/>WebRTC 媒體伺服器<br/>視訊/音訊混流處理"]
 
-        JitsiWeb -.-> Prosody
-        Jicofo -.-> Prosody
-        JVB -.-> Jicofo
+        JitsiWeb -.->|XMPP| Prosody
+        Jicofo -.->|XMPP Control| Prosody
+        JVB -.->|Bridge Channel| Jicofo
     end
 
-    subgraph CloudTier["☁️ 雲端服務層"]
+    subgraph CloudTier["☁️ 雲端服務層 - Cloud Services"]
         direction LR
-        AWS["🌍 AWS Transcribe"]
+        AWS["🌍 AWS Transcribe<br/>即時語音轉文字 API<br/>支援多語言識別<br/>串流轉錄處理"]
     end
 
-    subgraph ProcessingTier["⚙️ 處理層"]
+    subgraph ProcessingTier["⚙️ 處理層 - Processing Layer"]
         direction LR
-        subgraph AICore["🤖 AI 核心"]
-            AIEngine["🤖 LangChain"]
-            Qdrant[("🔍 Qdrant")]
-            Redis[("💾 Redis")]
+        subgraph AICore["🤖 AI 智能核心 - AI Core"]
+            AIEngine["🤖 LangChain Framework<br/>GPT-4/Claude API<br/>文本糾錯與優化<br/>會議摘要生成"]
+            Qdrant[("🔍 Qdrant Vector DB<br/>Port 6333<br/>語義搜索引擎<br/>會議記錄向量化存儲")]
+            Redis[("💾 Redis Cache<br/>Port 6379<br/>即時轉錄緩存<br/>會話狀態管理")]
 
-            AIEngine <--> Qdrant
-            AIEngine <--> Redis
+            AIEngine <-->|向量搜索| Qdrant
+            AIEngine <-->|快取存取| Redis
         end
 
-        subgraph Translation["🌐 翻譯服務"]
-            TransSvc["🌐 Translator"]
-            Google["Google API"]
-            DeepL["DeepL API"]
+        subgraph Translation["🌐 多語言翻譯服務 - Translation Service"]
+            TransSvc["🌐 Translation Gateway<br/>統一翻譯介面<br/>語言自動檢測"]
+            Google["Google Translate API<br/>100+ 語言支援<br/>神經機器翻譯"]
+            DeepL["DeepL Pro API<br/>高品質翻譯<br/>專業術語處理"]
 
-            TransSvc --> Google
-            TransSvc -.-> DeepL
+            TransSvc -->|主要| Google
+            TransSvc -.->|備援| DeepL
         end
     end
 
-    subgraph MessageTier["📡 訊息層"]
-        MQTT["📡 Mosquitto MQTT"]
+    subgraph MessageTier["📡 訊息層 - Message Layer"]
+        MQTT["📡 Mosquitto MQTT Broker<br/>Port 1883/8883 (SSL)<br/>即時訊息發布訂閱<br/>多客戶端同步"]
     end
 
-    %% Main flow connections
-    WebApp -->|1.請求會議| FastAPI
-    FastAPI -->|2.JWT| JitsiWeb
-    WebApp -->|3.WebRTC| JVB
+    %% Main flow connections with detailed labels
+    WebApp -->|"1. 請求會議<br/>Meeting Request"| FastAPI
+    FastAPI -->|"2. JWT Token<br/>授權憑證"| JitsiWeb
+    WebApp -->|"3. WebRTC 連線<br/>P2P/SFU Stream"| JVB
 
-    WebAudio -->|4.音訊| WSServer
-    WSServer -->|5.簽名URL| AWS
-    AWS -->|6.轉錄| WSServer
+    WebAudio -->|"4. 音訊串流<br/>Audio Stream<br/>16kHz PCM"| WSServer
+    WSServer -->|"5. 簽名 URL<br/>Presigned URL<br/>AWS Auth"| AWS
+    AWS -->|"6. 即時轉錄<br/>Live Transcription<br/>JSON Format"| WSServer
 
-    WSServer -->|7.原文| AIEngine
-    AIEngine -->|8.修正文| TransSvc
-    TransSvc -->|9.發布| MQTT
-    MQTT -->|10.訂閱| WebApp
+    WSServer -->|"7. 原始文本<br/>Raw Transcript"| AIEngine
+    AIEngine -->|"8. 修正文本<br/>Corrected Text<br/>+ Summary"| TransSvc
+    TransSvc -->|"9. 發布結果<br/>Publish Results<br/>Multi-language"| MQTT
+    MQTT -->|"10. 訂閱更新<br/>Subscribe Updates<br/>Real-time Sync"| WebApp
 
     classDef client fill:#ffcccc,stroke:#ff6666,stroke-width:2px
     classDef gateway fill:#ccffcc,stroke:#66cc66,stroke-width:2px
