@@ -23,6 +23,9 @@
             align-items: center;
             gap: 30px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: visible;
+            min-height: 120px;
         }
         .logo {
             width: 80px;
@@ -81,6 +84,400 @@
         }
         .diagram-container {
             margin: 40px 0;
+        }
+        /* Running Cat Animation */
+        .running-cat-container {
+            position: absolute;
+            bottom: 0;
+            left: 5px;
+            cursor: pointer;
+            transition: left 0.1s linear;
+            z-index: 10;
+        }
+        .running-cat-container:hover {
+            transform: scale(1.1);
+        }
+        .running-cat {
+            width: 80px;
+            height: 60px;
+            position: relative;
+            animation: catRun 1s steps(4) infinite;
+            transform-origin: center center;
+            transition: transform 0.3s ease;
+        }
+
+        .cat-body {
+            position: absolute;
+            width: 45px;
+            height: 30px;
+            background: linear-gradient(135deg, #ffa5c9 0%, #ffb3d0 50%, #ffc0d9 100%);
+            border-radius: 70% 70% 50% 50% / 50% 50% 40% 40%;
+            top: 20px;
+            left: 17px;
+            box-shadow: 0 3px 10px rgba(255, 182, 193, 0.5);
+            transition: transform 0.2s ease;
+        }
+        .cat-head {
+            position: absolute;
+            width: 38px;
+            height: 35px;
+            background: linear-gradient(135deg, #ffb3d0 0%, #ffc0d9 50%, #ffd0e5 100%);
+            border-radius: 55% 55% 50% 50%;
+            top: 3px;
+            left: 30px;
+            overflow: visible;
+            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.4);
+            transition: transform 0.2s ease;
+        }
+        .cat-head::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 25px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.3) 100%);
+            border-radius: 50%;
+            top: 5px;
+            left: 9px;
+            transform: rotate(-20deg);
+            animation: shine 3s ease-in-out infinite;
+        }
+        @keyframes shine {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.9; }
+        }
+        .cat-ear-left,
+        .cat-ear-right {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #ffb3d0 0%, #ffc0d9 100%);
+            border-radius: 50% 10% 50% 50%;
+            top: -5px;
+            box-shadow: 0 1px 5px rgba(255, 182, 193, 0.3);
+        }
+        .cat-ear-left {
+            left: 5px;
+            transform: rotate(-45deg);
+        }
+        .cat-ear-right {
+            right: 5px;
+            transform: rotate(45deg);
+        }
+        .cat-ear-left::after,
+        .cat-ear-right::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #ffb3d0;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+        }
+        .cat-tail {
+            position: absolute;
+            width: 25px;
+            height: 18px;
+            background: linear-gradient(135deg, #ffb3d0 0%, #ffc0d9 100%);
+            border-radius: 50%;
+            top: 18px;
+            left: 0px;
+            transform-origin: right center;
+            animation: tailWag 0.8s ease-in-out infinite alternate;
+            box-shadow: 0 2px 5px rgba(255, 182, 193, 0.3);
+            transition: transform 0.2s ease;
+        }
+        .cat-leg {
+            position: absolute;
+            width: 10px;
+            height: 12px;
+            background: linear-gradient(135deg, #ffb3d0 0%, #ffc0d9 100%);
+            border-radius: 50% 50% 60% 60%;
+            bottom: 0;
+            box-shadow: 0 1px 3px rgba(255, 182, 193, 0.3);
+            transition: transform 0.2s ease;
+        }
+        .cat-leg1 {
+            left: 20px;
+            animation: legMove1 0.5s ease-in-out infinite;
+        }
+        .cat-leg2 {
+            left: 30px;
+            animation: legMove2 0.5s ease-in-out infinite;
+        }
+        .cat-leg3 {
+            left: 40px;
+            animation: legMove1 0.5s ease-in-out infinite;
+        }
+        .cat-leg4 {
+            left: 50px;
+            animation: legMove2 0.5s ease-in-out infinite;
+        }
+        .cat-eye {
+            position: absolute;
+            width: 10px;
+            height: 12px;
+            background: #333;
+            border-radius: 50%;
+            top: 12px;
+            animation: blink 4s infinite;
+            overflow: hidden;
+        }
+        .cat-eye::before {
+            content: '';
+            position: absolute;
+            width: 7px;
+            height: 9px;
+            background: #000;
+            border-radius: 50%;
+            top: 1px;
+            left: 1.5px;
+            transform: translate(var(--pupil-x, 0), var(--pupil-y, 0));
+            transition: transform 0.1s ease;
+        }
+        .cat-eye::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 5px;
+        }
+        .cat-eye-left {
+            left: 8px;
+        }
+        .cat-eye-right {
+            right: 8px;
+        }
+        @keyframes blink {
+            0%, 90%, 100% { 
+                transform: scaleY(1);
+            }
+            95% { 
+                transform: scaleY(0.1);
+            }
+        }
+        .cat-nose {
+            position: absolute;
+            width: 4px;
+            height: 3px;
+            background: #ff69b4;
+            border-radius: 50%;
+            top: 22px;
+            left: 17px;
+        }
+        .cat-cheek-left,
+        .cat-cheek-right {
+            position: absolute;
+            width: 8px;
+            height: 6px;
+            background: rgba(255, 182, 193, 0.6);
+            border-radius: 50%;
+            top: 20px;
+        }
+        .cat-cheek-left {
+            left: 2px;
+        }
+        .cat-cheek-right {
+            right: 2px;
+        }
+        .cat-whisker {
+            position: absolute;
+            width: 12px;
+            height: 1px;
+            background: rgba(0, 0, 0, 0.3);
+            top: 22px;
+        }
+        .cat-whisker-left1 {
+            left: -5px;
+            transform: rotate(10deg);
+        }
+        .cat-whisker-left2 {
+            left: -5px;
+            top: 25px;
+            transform: rotate(-10deg);
+        }
+        .cat-whisker-right1 {
+            right: -5px;
+            transform: rotate(-10deg);
+        }
+        .cat-whisker-right2 {
+            right: -5px;
+            top: 25px;
+            transform: rotate(10deg);
+        }
+        .cat-mouth {
+            position: absolute;
+            width: 6px;
+            height: 3px;
+            border: 1px solid #ff69b4;
+            border-top: none;
+            border-radius: 0 0 50% 50%;
+            top: 25px;
+            left: 16px;
+        }
+        .speech-bubble {
+            position: absolute;
+            background: linear-gradient(135deg, #fff 0%, #ffe0f0 100%);
+            border: 2px solid #ffb3d0;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 13px;
+            bottom: 60px;
+            right: -10px;
+            opacity: 0;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            transform-origin: bottom right;
+            box-shadow: 0 3px 10px rgba(255, 182, 193, 0.3);
+            font-weight: 500;
+            z-index: 11;
+            color: #000000;
+        }
+
+        /* Heart particles */
+        .heart-particle {
+            position: absolute;
+            font-size: 20px;
+            animation: floatUp 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 1001;
+        }
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.5);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) scale(1.5) rotate(360deg);
+            }
+        }
+        /* Sparkle effect */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ffeb3b;
+            border-radius: 50%;
+            animation: sparkle 1s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes sparkle {
+            0% {
+                opacity: 1;
+                transform: scale(0) rotate(0deg);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5) rotate(180deg);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0) rotate(360deg);
+            }
+        }
+        /* Purr animation */
+        .cat-body.purring {
+            animation: purr 0.2s ease-in-out infinite;
+        }
+        @keyframes purr {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-1px); }
+            75% { transform: translateX(1px); }
+        }
+        /* Rainbow trail */
+        .rainbow-trail {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            opacity: 0.6;
+            animation: fadeOut 1s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes fadeOut {
+            to { 
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+        .speech-bubble:before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #ffb3d0;
+        }
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 21px;
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid #ffe0f0;
+        }
+        /* Walking animation */
+        .running-cat-container.walking {
+            animation: walking 0.6s ease-in-out infinite;
+        }
+        @keyframes walking {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+        /* Eye follow cursor */
+        .cat-eye-pupil {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #000;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease;
+        }
+        .running-cat-container:hover .speech-bubble {
+            opacity: 1;
+        }
+        @keyframes catRun {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(5px); }
+        }
+        @keyframes tailWag {
+            0% { transform: rotate(-20deg) translateY(0); }
+            50% { transform: rotate(20deg) translateY(-2px); }
+            100% { transform: rotate(-20deg) translateY(0); }
+        }
+        /* Paw pads */
+        .cat-leg::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 3px;
+            background: #ff69b4;
+            border-radius: 50%;
+        }
+        @keyframes legMove1 {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(-15deg); }
+        }
+        @keyframes legMove2 {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(15deg); }
         }
         .footer {
             background: #2d3748;
@@ -143,6 +540,30 @@
             .footer {
                 padding: 30px 20px;
             }
+            .running-cat-container {
+                position: absolute;
+                bottom: 0;
+                left: 5px;
+                transform: scale(0.6);
+            }
+            .running-cat-container:hover {
+                transform: scale(0.7);
+            }
+            .speech-bubble {
+                font-size: 10px;
+                padding: 6px 10px;
+                bottom: 50px;
+                right: -5px;
+            }
+            .header {
+                flex-wrap: wrap;
+                justify-content: center;
+                position: relative;
+            }
+            .company-info {
+                text-align: center;
+                margin-bottom: 10px;
+            }
         }
     </style>
 </head>
@@ -154,6 +575,32 @@
         <div class="company-info">
             <h1>數辰創藝科技股份有限公司</h1>
             <p>TeamSync Network Architecture Documentation</p>
+        </div>
+        <!-- Running Cat Animation -->
+        <div class="running-cat-container" onclick="catSpeak()">
+            <div class="running-cat">
+                <div class="cat-tail"></div>
+                <div class="cat-body"></div>
+                <div class="cat-head">
+                    <div class="cat-ear-left"></div>
+                    <div class="cat-ear-right"></div>
+                    <div class="cat-eye cat-eye-left"></div>
+                    <div class="cat-eye cat-eye-right"></div>
+                    <div class="cat-nose"></div>
+                    <div class="cat-cheek-left"></div>
+                    <div class="cat-cheek-right"></div>
+                    <div class="cat-whisker cat-whisker-left1"></div>
+                    <div class="cat-whisker cat-whisker-left2"></div>
+                    <div class="cat-whisker cat-whisker-right1"></div>
+                    <div class="cat-whisker cat-whisker-right2"></div>
+                    <div class="cat-mouth"></div>
+                </div>
+                <div class="cat-leg cat-leg1"></div>
+                <div class="cat-leg cat-leg2"></div>
+                <div class="cat-leg cat-leg3"></div>
+                <div class="cat-leg cat-leg4"></div>
+            </div>
+            <div class="speech-bubble" id="catSpeech">喵~ 點我會有驚喜! 💖</div>
         </div>
     </header>
     
@@ -236,6 +683,336 @@
                 noteBkgColor: '#fffacd',
                 noteTextColor: '#000000'
             }
+        });
+
+        // Cat speaking messages
+        const catMessages = [
+            "喵~ 點我會有驚喜! 💖",
+            "這個系統設計真棒! 😸",
+            "我喜歡 TeamSync! 🐾",
+            "摸摸我會呼嚕嚕~ 😊",
+            "需要我幫忙嗎? 😺",
+            "喵嗚~ 我是粉紅貓貓! 🌸",
+            "讓我們一起寫程式吧! 💻",
+            "我會發光哦! ✨",
+            "數辰創藝科技加油! 🎉",
+            "給你一個愛心! 💕"
+        ];
+
+        let messageIndex = 0;
+
+        // Create heart particle
+        function createHeart(x, y) {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle';
+            heart.innerHTML = '💖';
+            heart.style.left = x + 'px';
+            heart.style.top = y + 'px';
+            heart.style.color = `hsl(${Math.random() * 60 + 330}, 100%, 70%)`;
+            document.body.appendChild(heart);
+            
+            setTimeout(() => heart.remove(), 2000);
+        }
+
+        // Create sparkle
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = (x + Math.random() * 40 - 20) + 'px';
+            sparkle.style.top = (y + Math.random() * 40 - 20) + 'px';
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => sparkle.remove(), 1000);
+        }
+
+        // Make cat purr
+        function makePurr() {
+            const catBody = document.querySelector('.cat-body');
+            catBody.classList.add('purring');
+            
+            setTimeout(() => {
+                catBody.classList.remove('purring');
+            }, 1000);
+        }
+
+        function catSpeak() {
+            const speechBubble = document.getElementById('catSpeech');
+            const catContainer = document.querySelector('.running-cat-container');
+            const rect = catContainer.getBoundingClientRect();
+            
+            messageIndex = (messageIndex + 1) % catMessages.length;
+            speechBubble.textContent = catMessages[messageIndex];
+            
+            // Create multiple hearts
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    createHeart(
+                        rect.left + rect.width / 2 + Math.random() * 40 - 20,
+                        rect.top + Math.random() * 20
+                    );
+                }, i * 200);
+            }
+            
+            // Create sparkles
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createSparkle(
+                        rect.left + rect.width / 2,
+                        rect.top + rect.height / 2
+                    );
+                }, i * 100);
+            }
+            
+            // Make cat purr
+            makePurr();
+            
+            // Add walking animation
+            catContainer.classList.add('walking');
+            setTimeout(() => {
+                catContainer.classList.remove('walking');
+            }, 3000);
+            
+            // Jump animation (smaller jump since on ground)
+            const originalTransform = catContainer.style.transform;
+            catContainer.style.transform = 'translateY(-20px) scale(1.1)';
+            
+            setTimeout(() => {
+                catContainer.style.transform = originalTransform;
+            }, 500);
+        }
+
+        // Add eye tracking
+        function trackMouse(e) {
+            const eyes = document.querySelectorAll('.cat-eye');
+            const header = document.querySelector('.header');
+            const headerRect = header.getBoundingClientRect();
+            
+            // Only track if mouse is over header
+            if (e.clientY > headerRect.bottom) return;
+            
+            eyes.forEach(eye => {
+                const rect = eye.getBoundingClientRect();
+                const eyeCenterX = rect.left + rect.width / 2;
+                const eyeCenterY = rect.top + rect.height / 2;
+                
+                const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
+                const distance = Math.min(2, Math.sqrt(
+                    Math.pow(e.clientX - eyeCenterX, 2) + 
+                    Math.pow(e.clientY - eyeCenterY, 2)
+                ) / 50);
+                
+                const pupilX = Math.cos(angle) * distance;
+                const pupilY = Math.sin(angle) * distance;
+                
+                const beforeElement = eye.querySelector('::before');
+                if (eye.style) {
+                    eye.style.setProperty('--pupil-x', pupilX + 'px');
+                    eye.style.setProperty('--pupil-y', pupilY + 'px');
+                }
+            });
+        }
+
+        // Add mouse tracking
+        document.addEventListener('mousemove', trackMouse);
+
+
+
+        // Cat walking behavior
+        let isWalking = false;
+        let walkDirection = 1; // 1 for right, -1 for left
+        let currentPosition = 5;
+        let headerWidth = 0;
+        let catWidth = 60; // Smaller cat width for better movement
+        
+        // Update header width on window resize
+        function updateHeaderWidth() {
+            const header = document.querySelector('.header');
+            headerWidth = header.offsetWidth;
+        }
+        
+        // Initialize header width
+        updateHeaderWidth();
+        window.addEventListener('resize', updateHeaderWidth);
+        
+        function startWalking() {
+            if (isWalking) return;
+            isWalking = true;
+            const catContainer = document.querySelector('.running-cat-container');
+            catContainer.classList.add('walking');
+            
+            // Random direction if starting from left edge
+            if (currentPosition === 5) {
+                walkDirection = 1; // Start walking right
+            }
+            
+            // Calculate new position with larger steps
+            const stepSize = 3;
+            const newPosition = currentPosition + (walkDirection * stepSize);
+            
+            // Check if we're crossing the middle line
+            const middleLine = headerWidth / 2;
+            const isCrossingMiddle = (currentPosition < middleLine && newPosition >= middleLine) || 
+                                   (currentPosition > middleLine && newPosition <= middleLine);
+            
+            // Calculate turn probability based on distance from middle
+            const distanceFromMiddle = Math.abs(newPosition - middleLine);
+            const maxDistance = headerWidth / 2;
+            const turnProbability = Math.max(0.1, (maxDistance - distanceFromMiddle) / maxDistance * 0.8);
+            
+            // Turn back if crossing middle with probability, or if hitting edges
+            if ((isCrossingMiddle && Math.random() < turnProbability) || 
+                newPosition <= 5 || newPosition >= headerWidth - catWidth - 5) {
+                
+                walkDirection *= -1;
+                
+                // Mirror the entire cat (head and body)
+                const catElement = document.querySelector('.running-cat');
+                const catHead = document.querySelector('.cat-head');
+                const catBody = document.querySelector('.cat-body');
+                const catTail = document.querySelector('.cat-tail');
+                const catLegs = document.querySelectorAll('.cat-leg');
+                
+                if (walkDirection === -1) {
+                    // Walking left - mirror everything
+                    catElement.style.transform = 'scaleX(-1)';
+                    catHead.style.transform = 'scaleX(-1)';
+                    catBody.style.transform = 'scaleX(-1)';
+                    catTail.style.transform = 'scaleX(-1)';
+                    catLegs.forEach(leg => leg.style.transform = 'scaleX(-1)');
+                } else {
+                    // Walking right - normal orientation
+                    catElement.style.transform = 'scaleX(1)';
+                    catHead.style.transform = 'scaleX(1)';
+                    catBody.style.transform = 'scaleX(1)';
+                    catTail.style.transform = 'scaleX(1)';
+                    catLegs.forEach(leg => leg.style.transform = 'scaleX(1)');
+                }
+                
+                // Add a small pause when turning
+                setTimeout(() => {
+                    if (isWalking) {
+                        startWalking();
+                    }
+                }, 300);
+                return;
+            }
+            
+            currentPosition = newPosition;
+            catContainer.style.left = currentPosition + 'px';
+            
+            // Continue walking
+            setTimeout(() => {
+                if (isWalking) {
+                    startWalking();
+                }
+            }, 100);
+        }
+        
+        function stopWalking() {
+            isWalking = false;
+            const catContainer = document.querySelector('.running-cat-container');
+            catContainer.classList.remove('walking');
+        }
+        
+        // Start walking after a delay
+        setTimeout(() => {
+            startWalking();
+        }, 3000);
+        
+        // Randomly pause and resume for more natural behavior
+        setInterval(() => {
+            if (isWalking && Math.random() > 0.8) {
+                stopWalking();
+                setTimeout(() => {
+                    if (!isWalking) {
+                        startWalking();
+                    }
+                }, Math.random() * 3000 + 2000);
+            }
+        }, 8000);
+        
+        // Add hover effect for cat
+        const catContainer = document.querySelector('.running-cat-container');
+        catContainer.addEventListener('mouseenter', () => {
+            stopWalking();
+            const speechBubble = document.getElementById('catSpeech');
+            speechBubble.style.opacity = '1';
+            speechBubble.style.transform = 'scale(1.1)';
+            
+            // Create small hearts on hover
+            const rect = catContainer.getBoundingClientRect();
+            createHeart(rect.left + rect.width / 2, rect.top);
+        });
+        
+        catContainer.addEventListener('mouseleave', () => {
+            const speechBubble = document.getElementById('catSpeech');
+            speechBubble.style.opacity = '0';
+            speechBubble.style.transform = 'scale(1)';
+            
+            // Resume walking after a short delay
+            setTimeout(() => {
+                if (!isWalking) {
+                    startWalking();
+                }
+            }, 1000);
+        });
+
+        // Add continuous sparkle effect
+        setInterval(() => {
+            if (Math.random() > 0.8) {
+                const rect = catContainer.getBoundingClientRect();
+                createSparkle(
+                    rect.left + Math.random() * rect.width,
+                    rect.top + Math.random() * rect.height
+                );
+            }
+        }, 3000);
+
+        // Add rainbow glow on special occasions
+        let glowIndex = 0;
+        const glowColors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'];
+        
+        setInterval(() => {
+            if (messageIndex === 0 || messageIndex === 9) { // Special messages
+                const catBody = document.querySelector('.cat-body');
+                catBody.style.boxShadow = `0 0 20px ${glowColors[glowIndex]}`;
+                glowIndex = (glowIndex + 1) % glowColors.length;
+            }
+        }, 800);
+
+        // Initial cute entrance animation
+        window.addEventListener('load', () => {
+            const catContainer = document.querySelector('.running-cat-container');
+            catContainer.style.opacity = '0';
+            catContainer.style.transform = 'scale(0)';
+            
+            setTimeout(() => {
+                catContainer.style.transition = 'all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                catContainer.style.opacity = '1';
+                catContainer.style.transform = 'scale(1) rotate(360deg)';
+                
+                // Welcome message
+                setTimeout(() => {
+                    const speechBubble = document.getElementById('catSpeech');
+                    speechBubble.style.opacity = '1';
+                    speechBubble.textContent = '喵~ 歡迎來到 TeamSync! 🎀';
+                    
+                    // Create entrance hearts
+                    const rect = catContainer.getBoundingClientRect();
+                    for (let i = 0; i < 5; i++) {
+                        setTimeout(() => {
+                            createHeart(
+                                rect.left + rect.width / 2 + (Math.random() - 0.5) * 60,
+                                rect.top + rect.height / 2
+                            );
+                        }, i * 100);
+                    }
+                    
+                    setTimeout(() => {
+                        speechBubble.style.opacity = '0';
+                    }, 3000);
+                }, 1000);
+            }, 500);
         });
 
         // Load and render diagrams

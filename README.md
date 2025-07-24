@@ -51,6 +51,7 @@ It may take a few minutes for the site to become available.
 - Clean Mermaid diagrams with black text
 - Responsive design for mobile and desktop
 - Simple, static diagram display
+- 🐱 Animated running cat mascot (inspired by Google Colab)
 
 ## 🛠️ Local Development
 
