@@ -1,0 +1,82 @@
+graph TB
+    subgraph ClientTier["👥 客戶端層"]
+        direction LR
+        WebApp["🌐 Web App<br/>Jitsi IFrame"]
+        WebAudio["🎤 Web Audio API"]
+    end
+
+    subgraph GatewayTier["🚪 API 閘道層"]
+        direction LR
+        FastAPI["📹 FastAPI:8888"]
+        WSServer["🎙️ WebSocket Server"]
+    end
+
+    subgraph VideoTier["📹 視訊服務層"]
+        direction LR
+        JitsiWeb["🌐 Jitsi Web:443"]
+        Prosody["💬 Prosody:5222"]
+        Jicofo["🎯 Jicofo:8888"]
+        JVB["🎥 JVB:10000"]
+
+        JitsiWeb -.-> Prosody
+        Jicofo -.-> Prosody
+        JVB -.-> Jicofo
+    end
+
+    subgraph CloudTier["☁️ 雲端服務層"]
+        direction LR
+        AWS["🌍 AWS Transcribe"]
+    end
+
+    subgraph ProcessingTier["⚙️ 處理層"]
+        direction LR
+        subgraph AICore["🤖 AI 核心"]
+            AIEngine["🤖 LangChain"]
+            Qdrant[("🔍 Qdrant")]
+            Redis[("💾 Redis")]
+
+            AIEngine <--> Qdrant
+            AIEngine <--> Redis
+        end
+
+        subgraph Translation["🌐 翻譯服務"]
+            TransSvc["🌐 Translator"]
+            Google["Google API"]
+            DeepL["DeepL API"]
+
+            TransSvc --> Google
+            TransSvc -.-> DeepL
+        end
+    end
+
+    subgraph MessageTier["📡 訊息層"]
+        MQTT["📡 Mosquitto MQTT"]
+    end
+
+    %% Main flow connections
+    WebApp -->|1.請求會議| FastAPI
+    FastAPI -->|2.JWT| JitsiWeb
+    WebApp -->|3.WebRTC| JVB
+
+    WebAudio -->|4.音訊| WSServer
+    WSServer -->|5.簽名URL| AWS
+    AWS -->|6.轉錄| WSServer
+
+    WSServer -->|7.原文| AIEngine
+    AIEngine -->|8.修正文| TransSvc
+    TransSvc -->|9.發布| MQTT
+    MQTT -->|10.訂閱| WebApp
+
+    classDef client fill:#ffcccc,stroke:#ff6666,stroke-width:2px
+    classDef gateway fill:#ccffcc,stroke:#66cc66,stroke-width:2px
+    classDef video fill:#ffd9b3,stroke:#ff8800,stroke-width:2px
+    classDef cloud fill:#e6f3ff,stroke:#0066cc,stroke-width:2px
+    classDef ai fill:#ccccff,stroke:#6666ff,stroke-width:2px
+    classDef message fill:#fff2cc,stroke:#d6b656,stroke-width:2px
+
+    class WebApp,WebAudio client
+    class FastAPI,WSServer gateway
+    class JitsiWeb,Jicofo,JVB,Prosody video
+    class AWS cloud
+    class AIEngine,Qdrant,Redis,TransSvc,Google,DeepL ai
+    class MQTT message 

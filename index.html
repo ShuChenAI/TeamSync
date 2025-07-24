@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeamSync Network Architecture</title>
+    <title>TeamSync Network Architecture - 數辰創藝科技</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.2.0/github-markdown.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         body {
@@ -13,8 +12,44 @@
             min-width: 200px;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 45px;
+            padding: 0;
             background-color: #f6f8fa;
+        }
+        .header {
+            background: linear-gradient(135deg, #6b46c1 0%, #e53e3e 100%);
+            color: white;
+            padding: 30px 45px;
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            padding: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .company-info h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        .company-info p {
+            margin: 5px 0 0 0;
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        .main-content {
+            padding: 45px;
         }
         .markdown-body {
             background-color: white;
@@ -37,69 +72,192 @@
         }
         .mermaid {
             text-align: center;
-            margin: 20px 0;
+            margin: 30px 0;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .diagram-container {
+            margin: 40px 0;
+        }
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 40px 45px;
+            margin-top: 60px;
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .footer-section h3 {
+            margin: 0 0 15px 0;
+            color: #f7fafc;
+            font-size: 18px;
+        }
+        .footer-section p,
+        .footer-section a {
+            margin: 8px 0;
+            color: #e2e8f0;
+            text-decoration: none;
+            line-height: 1.6;
+        }
+        .footer-section a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+        .footer-bottom {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #4a5568;
+            color: #a0aec0;
         }
         @media (max-width: 767px) {
-            body {
+            .header {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+            .logo {
+                width: 60px;
+                height: 60px;
+            }
+            .company-info h1 {
+                font-size: 22px;
+            }
+            .company-info p {
+                font-size: 16px;
+            }
+            .main-content {
                 padding: 15px;
             }
             .markdown-body {
                 padding: 20px;
             }
+            .footer {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="content" class="markdown-body"></div>
+    <header class="header">
+        <div class="logo">
+            <img src="logo.jpg" alt="數辰創藝科技 Logo">
+        </div>
+        <div class="company-info">
+            <h1>數辰創藝科技股份有限公司</h1>
+            <p>TeamSync Network Architecture Documentation</p>
+        </div>
+    </header>
+    
+    <div class="main-content">
+        <div class="markdown-body">
+        <h1>TeamSync 網路通訊流程圖</h1>
+
+        <h2>系統架構概覽</h2>
+        <p>本文件描述 TeamSync 後端系統的網路通訊架構，展示行動前端如何通過防火牆與後端互動，以及 AI 工作流程如何安全地訪問內部資料庫和企業系統。</p>
+
+        <h2>網路架構圖（含 RPA 整合）</h2>
+        <div class="diagram-container">
+            <div id="diagram1" class="mermaid"></div>
+        </div>
+
+        <h2>TeamSync 視訊會議與智能轉錄功能架構</h2>
+        <p>本節詳細說明 TeamSync 的進階功能：Jitsi 視訊會議整合與即時智能轉錄系統。</p>
+
+        <h3>視訊會議與轉錄整合架構圖</h3>
+        <div class="diagram-container">
+            <div id="diagram2" class="mermaid"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>關於我們</h3>
+                <p>數辰創藝科技股份有限公司</p>
+                <p>專注於提供創新的 TeamSync 解決方案</p>
+            </div>
+            <div class="footer-section">
+                <h3>聯絡資訊</h3>
+                <p>📧 Email: <a href="mailto:scxai@shuchenai.com">scxai@shuchenai.com</a></p>
+                <p>📞 電話: <a href="tel:+886-2-7748-0805">+886-2-7748-0805</a></p>
+            </div>
+            <div class="footer-section">
+                <h3>公司地址</h3>
+                <p>📍 台北市松山區敦化南路一段2號14樓D室</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 數辰創藝科技股份有限公司. All rights reserved.</p>
+        </div>
+    </footer>
 
     <script>
-        // Initialize mermaid
+        // Initialize mermaid with black text theme
         mermaid.initialize({ 
             startOnLoad: false,
-            theme: 'default',
+            theme: 'base',
             themeVariables: {
-                primaryColor: '#2188ff',
-                primaryTextColor: '#fff',
-                primaryBorderColor: '#0366d6',
-                lineColor: '#586069',
+                primaryColor: '#e8f4ff',
+                primaryTextColor: '#000000',
+                primaryBorderColor: '#2188ff',
+                lineColor: '#000000',
                 secondaryColor: '#f6f8fa',
-                tertiaryColor: '#fafbfc'
+                tertiaryColor: '#fafbfc',
+                background: '#ffffff',
+                mainBkg: '#e8f4ff',
+                secondBkg: '#f6f8fa',
+                tertiaryBkg: '#fafbfc',
+                primaryTextColor: '#000000',
+                secondaryTextColor: '#000000',
+                tertiaryTextColor: '#000000',
+                lineColor: '#333333',
+                textColor: '#000000',
+                mainContrastColor: '#000000',
+                darkTextColor: '#000000',
+                border1: '#2188ff',
+                border2: '#0366d6',
+                arrowheadColor: '#333333',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+                fontSize: '16px',
+                labelBackground: '#ffffff',
+                edgeLabelBackground: '#ffffff',
+                actorTextColor: '#000000',
+                signalTextColor: '#000000',
+                noteBkgColor: '#fffacd',
+                noteTextColor: '#000000'
             }
         });
 
-        // Load and render markdown content
-        fetch('diagram.md')
-            .then(response => response.text())
-            .then(markdown => {
-                // First, render the markdown
-                const html = marked.parse(markdown);
-                document.getElementById('content').innerHTML = html;
+        // Load and render diagrams
+        Promise.all([
+            fetch('diagram1.mmd').then(r => r.text()),
+            fetch('diagram2.mmd').then(r => r.text())
+        ]).then(([diagram1Code, diagram2Code]) => {
+            // Render first diagram
+            document.getElementById('diagram1').textContent = diagram1Code;
+            
+            // Render second diagram
+            document.getElementById('diagram2').textContent = diagram2Code;
 
-                // Then, find all code blocks with mermaid language
-                const codeBlocks = document.querySelectorAll('pre code.language-mermaid');
-                codeBlocks.forEach((block, index) => {
-                    // Get the mermaid code
-                    const code = block.textContent;
-                    
-                    // Create a div for mermaid to render into
-                    const mermaidDiv = document.createElement('div');
-                    mermaidDiv.className = 'mermaid';
-                    mermaidDiv.textContent = code;
-                    
-                    // Replace the code block with the mermaid div
-                    block.parentElement.parentElement.replaceChild(mermaidDiv, block.parentElement);
-                });
-
-                // Render all mermaid diagrams
-                mermaid.run();
-            })
-            .catch(error => {
-                document.getElementById('content').innerHTML = `
-                    <h1>Error loading content</h1>
-                    <p>Could not load diagram.md. Please make sure the file exists.</p>
+            // Run mermaid
+            mermaid.run();
+        }).catch(error => {
+            console.error('Error loading diagrams:', error);
+            document.querySelector('.markdown-body').innerHTML += `
+                <div style="color: red; margin: 20px 0;">
+                    <h3>Error loading diagrams</h3>
+                    <p>Please make sure diagram1.mmd and diagram2.mmd files exist.</p>
                     <pre>${error}</pre>
-                `;
-            });
+                </div>
+            `;
+        });
     </script>
 </body>
 </html> 

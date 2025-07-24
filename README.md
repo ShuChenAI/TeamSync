@@ -39,7 +39,9 @@ It may take a few minutes for the site to become available.
 ## 📁 Repository Structure
 
 - `index.html` - Main page that renders the Mermaid diagrams
-- `diagram.md` - Source markdown file with all the diagrams
+- `diagram1.mmd` - Network architecture diagram
+- `diagram2.mmd` - Video conference architecture diagram
+- `logo.jpg` - Company logo (required)
 - `_config.yml` - Jekyll configuration for GitHub Pages
 - `README.md` - This file
 
