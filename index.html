@@ -89,152 +89,250 @@
         .running-cat-container {
             position: absolute;
             bottom: 0;
-            left: 5px;
+            left: 10%;
             cursor: pointer;
             transition: left 0.1s linear;
             z-index: 10;
+            display: none; /* Hide initially until position is set */
         }
-        .running-cat-container:hover {
-            transform: scale(1.1);
-        }
+        /* Removed hover transform to avoid conflicts with direction flipping */
         .running-cat {
-            width: 80px;
-            height: 60px;
+            width: 100px;
+            height: 70px;
             position: relative;
-            animation: catRun 1s steps(4) infinite;
             transform-origin: center center;
             transition: transform 0.3s ease;
         }
 
         .cat-body {
             position: absolute;
-            width: 45px;
-            height: 30px;
-            background: linear-gradient(135deg, #ffa5c9 0%, #ffb3d0 50%, #ffc0d9 100%);
-            border-radius: 70% 70% 50% 50% / 50% 50% 40% 40%;
-            top: 20px;
-            left: 17px;
-            box-shadow: 0 3px 10px rgba(255, 182, 193, 0.5);
-            transition: transform 0.2s ease;
+            width: 55px;
+            height: 35px;
+            background: radial-gradient(ellipse at top left, #f8a5c9 0%, #ffb8d0 20%, #ffc0d5 60%, #ffbdce 100%);
+            border-radius: 65% 75% 45% 40% / 45% 50% 35% 40%;
+            top: 25px;
+            left: 20px;
+            box-shadow: 
+                0 5px 15px rgba(255, 182, 193, 0.6),
+                inset -3px -2px 8px rgba(255, 140, 180, 0.3),
+                inset 5px 2px 12px rgba(255, 255, 255, 0.2);
+            transition: transform 0.15s ease;
+            position: relative;
+            overflow: visible;
+        }
+        /* Fur texture stripes */
+        .cat-body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 3px,
+                rgba(255, 140, 180, 0.1) 3px,
+                rgba(255, 140, 180, 0.1) 4px
+            );
+            border-radius: inherit;
+            opacity: 0.5;
+        }
+        .cat-body.walking {
+            animation: bodyBob 0.4s ease-in-out infinite;
+        }
+        @keyframes bodyBob {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-1px) rotate(-1deg); }
+            75% { transform: translateY(-1px) rotate(1deg); }
         }
         .cat-head {
             position: absolute;
-            width: 38px;
-            height: 35px;
-            background: linear-gradient(135deg, #ffb3d0 0%, #ffc0d9 50%, #ffd0e5 100%);
-            border-radius: 55% 55% 50% 50%;
-            top: 3px;
-            left: 30px;
+            width: 45px;
+            height: 40px;
+            background: radial-gradient(ellipse at top center, #ffd0e5 0%, #ffc0d9 30%, #ffb3d0 70%, #ffa8c9 100%);
+            border-radius: 58% 58% 48% 48% / 55% 55% 45% 45%;
+            top: 0;
+            left: 35px;
             overflow: visible;
-            box-shadow: 0 2px 8px rgba(255, 182, 193, 0.4);
-            transition: transform 0.2s ease;
+            box-shadow: 
+                0 3px 12px rgba(255, 182, 193, 0.5),
+                inset -2px -1px 6px rgba(255, 140, 180, 0.2),
+                inset 3px 2px 8px rgba(255, 255, 255, 0.3);
+            transition: transform 0.15s ease;
         }
+        .cat-head.walking {
+            animation: headBob 0.4s ease-in-out infinite;
+        }
+        @keyframes headBob {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-1px) rotate(-2deg); }
+            75% { transform: translateY(-1px) rotate(2deg); }
+        }
+        /* Fur markings on head */
         .cat-head::before {
             content: '';
             position: absolute;
-            width: 20px;
-            height: 25px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.3) 100%);
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse 8px 12px at 75% 20%, rgba(255, 140, 180, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse 10px 15px at 25% 15%, rgba(255, 140, 180, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse 6px 10px at 50% 5%, rgba(255, 140, 180, 0.1) 0%, transparent 50%);
+            border-radius: inherit;
+        }
+        /* Light reflection */
+        .cat-head::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 28px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
             border-radius: 50%;
-            top: 5px;
-            left: 9px;
+            top: 3px;
+            left: 10px;
             transform: rotate(-20deg);
             animation: shine 3s ease-in-out infinite;
+            mix-blend-mode: overlay;
         }
         @keyframes shine {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 0.9; }
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.7; }
         }
         .cat-ear-left,
         .cat-ear-right {
             position: absolute;
-            width: 12px;
-            height: 12px;
-            background: linear-gradient(135deg, #ffb3d0 0%, #ffc0d9 100%);
-            border-radius: 50% 10% 50% 50%;
-            top: -5px;
-            box-shadow: 0 1px 5px rgba(255, 182, 193, 0.3);
+            width: 16px;
+            height: 20px;
+            background: radial-gradient(ellipse at bottom, #ffa8c9 0%, #ffb3d0 40%, #ffc0d9 100%);
+            border-radius: 50% 80% 0 100%;
+            top: -8px;
+            box-shadow: 
+                0 2px 6px rgba(255, 182, 193, 0.4),
+                inset 1px 1px 3px rgba(255, 255, 255, 0.3);
+            transform-origin: bottom center;
         }
         .cat-ear-left {
-            left: 5px;
-            transform: rotate(-45deg);
+            left: 6px;
+            transform: rotate(-25deg);
         }
         .cat-ear-right {
-            right: 5px;
-            transform: rotate(45deg);
+            right: 6px;
+            transform: rotate(25deg) scaleX(-1);
         }
+        /* Inner ear */
         .cat-ear-left::after,
         .cat-ear-right::after {
             content: '';
             position: absolute;
-            width: 6px;
-            height: 6px;
-            background: #ffb3d0;
-            border-radius: 50%;
-            top: 3px;
-            left: 3px;
+            width: 8px;
+            height: 12px;
+            background: linear-gradient(to bottom, #ff91b8 0%, #ffadc9 100%);
+            border-radius: 50% 80% 0 100%;
+            top: 4px;
+            left: 4px;
+            opacity: 0.7;
+        }
+        .cat-ear-left.walking,
+        .cat-ear-right.walking {
+            animation: earTwitch 2s ease-in-out infinite;
+        }
+        @keyframes earTwitch {
+            0%, 100% { transform: rotate(-25deg) scale(1); }
+            10% { transform: rotate(-28deg) scale(0.95); }
+            15% { transform: rotate(-23deg) scale(1.02); }
+        }
+        @keyframes earTwitchRight {
+            0%, 100% { transform: rotate(25deg) scaleX(-1) scale(1); }
+            10% { transform: rotate(28deg) scaleX(-1) scale(0.95); }
+            15% { transform: rotate(23deg) scaleX(-1) scale(1.02); }
         }
         .cat-tail {
             position: absolute;
-            width: 25px;
-            height: 18px;
-            background: linear-gradient(135deg, #ffb3d0 0%, #ffc0d9 100%);
-            border-radius: 50%;
-            top: 18px;
-            left: 0px;
-            transform-origin: right center;
-            animation: tailWag 0.8s ease-in-out infinite alternate;
-            box-shadow: 0 2px 5px rgba(255, 182, 193, 0.3);
+            width: 40px;
+            height: 22px;
+            background: radial-gradient(ellipse at right center, #ffa8c9 0%, #ffb3d0 30%, #ffc0d9 60%, #ffc5dc 100%);
+            border-radius: 20% 80% 80% 20% / 50% 50% 50% 50%;
+            top: 25px;
+            left: -15px;
+            transform-origin: 85% center;
+            animation: tailWag 1.2s ease-in-out infinite alternate;
+            box-shadow: 
+                0 3px 8px rgba(255, 182, 193, 0.4),
+                inset 2px 0 5px rgba(255, 255, 255, 0.2);
             transition: transform 0.2s ease;
+            z-index: -1;
+        }
+        /* Tail fur markings */
+        .cat-tail::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 4px,
+                rgba(255, 140, 180, 0.08) 4px,
+                rgba(255, 140, 180, 0.08) 5px
+            );
+            border-radius: inherit;
+        }
+        .cat-tail::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, #ffc0d9 0%, #ffb3d0 100%);
+            border-radius: 50%;
+            right: 3px;
+            top: 5px;
+            box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.3);
         }
         .cat-leg {
             position: absolute;
-            width: 10px;
-            height: 12px;
-            background: linear-gradient(135deg, #ffb3d0 0%, #ffc0d9 100%);
-            border-radius: 50% 50% 60% 60%;
+            width: 12px;
+            height: 18px;
+            background: linear-gradient(to bottom, #ffb3d0 0%, #ffc0d9 70%, #ffa8c9 100%);
+            border-radius: 40% 40% 50% 50% / 30% 30% 60% 60%;
             bottom: 0;
-            box-shadow: 0 1px 3px rgba(255, 182, 193, 0.3);
-            transition: transform 0.2s ease;
+            box-shadow: 
+                0 2px 4px rgba(255, 182, 193, 0.3),
+                inset 1px 0 2px rgba(255, 255, 255, 0.2);
+            transition: transform 0.15s ease;
+            transform-origin: top center;
         }
+        /* Front legs */
         .cat-leg1 {
-            left: 20px;
-            animation: legMove1 0.5s ease-in-out infinite;
+            left: 25px;
+            animation: frontLegMove1 0.4s ease-in-out infinite;
+            z-index: 2;
         }
         .cat-leg2 {
-            left: 30px;
-            animation: legMove2 0.5s ease-in-out infinite;
+            left: 38px;
+            animation: frontLegMove2 0.4s ease-in-out infinite;
+            z-index: 1;
         }
+        /* Back legs */
         .cat-leg3 {
-            left: 40px;
-            animation: legMove1 0.5s ease-in-out infinite;
+            left: 48px;
+            animation: backLegMove1 0.4s ease-in-out infinite;
+            height: 16px;
         }
         .cat-leg4 {
-            left: 50px;
-            animation: legMove2 0.5s ease-in-out infinite;
+            left: 60px;
+            animation: backLegMove2 0.4s ease-in-out infinite;
+            height: 16px;
         }
         .cat-eye {
             position: absolute;
             width: 10px;
-            height: 12px;
+            height: 10px;
             background: #333;
             border-radius: 50%;
-            top: 12px;
-            animation: blink 4s infinite;
+            top: 15px;
+            animation: blink 5s infinite;
             overflow: hidden;
         }
-        .cat-eye::before {
-            content: '';
-            position: absolute;
-            width: 7px;
-            height: 9px;
-            background: #000;
-            border-radius: 50%;
-            top: 1px;
-            left: 1.5px;
-            transform: translate(var(--pupil-x, 0), var(--pupil-y, 0));
-            transition: transform 0.1s ease;
-        }
+        /* Simple pupil */
         .cat-eye::after {
             content: '';
             position: absolute;
@@ -243,13 +341,24 @@
             background: #fff;
             border-radius: 50%;
             top: 2px;
-            left: 5px;
+            right: 2px;
+        }
+        /* Light reflection */
+        .eye-shine {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, #fff 0%, rgba(255,255,255,0.9) 50%, transparent 100%);
+            border-radius: 50%;
+            top: 3px;
+            right: 3px;
+            pointer-events: none;
         }
         .cat-eye-left {
-            left: 8px;
+            left: 10px;
         }
         .cat-eye-right {
-            right: 8px;
+            right: 10px;
         }
         @keyframes blink {
             0%, 90%, 100% { 
@@ -261,27 +370,29 @@
         }
         .cat-nose {
             position: absolute;
-            width: 4px;
-            height: 3px;
-            background: #ff69b4;
-            border-radius: 50%;
-            top: 22px;
-            left: 17px;
+            width: 0;
+            height: 0;
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            border-top: 4px solid #ff69b4;
+            top: 23px;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .cat-cheek-left,
         .cat-cheek-right {
             position: absolute;
-            width: 8px;
-            height: 6px;
-            background: rgba(255, 182, 193, 0.6);
+            width: 12px;
+            height: 10px;
+            background: radial-gradient(circle, rgba(255, 192, 203, 0.8) 0%, rgba(255, 182, 193, 0.4) 100%);
             border-radius: 50%;
-            top: 20px;
+            top: 18px;
         }
         .cat-cheek-left {
-            left: 2px;
+            left: 0;
         }
         .cat-cheek-right {
-            right: 2px;
+            right: 0;
         }
         .cat-whisker {
             position: absolute;
@@ -310,13 +421,12 @@
         }
         .cat-mouth {
             position: absolute;
-            width: 6px;
-            height: 3px;
-            border: 1px solid #ff69b4;
-            border-top: none;
-            border-radius: 0 0 50% 50%;
-            top: 25px;
-            left: 16px;
+            width: 1px;
+            height: 4px;
+            background: #ff69b4;
+            top: 27px;
+            left: 50%;
+            transform: translateX(-50%);
         }
         .speech-bubble {
             position: absolute;
@@ -388,6 +498,27 @@
             25% { transform: translateX(-1px); }
             75% { transform: translateX(1px); }
         }
+        /* Idle breathing animation */
+        .cat-body.idle {
+            animation: breathing 2s ease-in-out infinite;
+        }
+        @keyframes breathing {
+            0%, 100% { 
+                transform: scale(1, 1);
+            }
+            50% { 
+                transform: scale(1.02, 0.98);
+            }
+        }
+        .cat-tail.idle {
+            animation: tailSwish 3s ease-in-out infinite;
+        }
+        @keyframes tailSwish {
+            0%, 100% { transform: rotate(-25deg); }
+            25% { transform: rotate(-30deg); }
+            50% { transform: rotate(-20deg); }
+            75% { transform: rotate(-28deg); }
+        }
         /* Rainbow trail */
         .rainbow-trail {
             position: absolute;
@@ -403,6 +534,53 @@
             to { 
                 opacity: 0;
                 transform: scale(0.5);
+            }
+        }
+        /* Paw print trail */
+        .paw-print {
+            position: absolute;
+            width: 15px;
+            height: 18px;
+            opacity: 0.2;
+            animation: pawFade 3s ease-out forwards;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .paw-print::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 10px;
+            background: rgba(255, 179, 208, 0.4);
+            border-radius: 50%;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        /* Toe prints */
+        .paw-print::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 179, 208, 0.4);
+            border-radius: 50%;
+            bottom: 0;
+            left: 0;
+            box-shadow: 
+                5px 0 0 rgba(255, 179, 208, 0.4),
+                10px 0 0 rgba(255, 179, 208, 0.4),
+                2.5px -5px 0 0.8px rgba(255, 179, 208, 0.4),
+                7.5px -5px 0 0.8px rgba(255, 179, 208, 0.4);
+        }
+        @keyframes pawFade {
+            0% { 
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            100% { 
+                opacity: 0;
+                transform: scale(0.8);
             }
         }
         .speech-bubble:before {
@@ -429,11 +607,11 @@
         }
         /* Walking animation */
         .running-cat-container.walking {
-            animation: walking 0.6s ease-in-out infinite;
+            animation: walking 0.3s ease-in-out infinite;
         }
         @keyframes walking {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
+            50% { transform: translateY(-3px); }
         }
         /* Eye follow cursor */
         .cat-eye-pupil {
@@ -455,9 +633,11 @@
             100% { transform: translateX(5px); }
         }
         @keyframes tailWag {
-            0% { transform: rotate(-20deg) translateY(0); }
-            50% { transform: rotate(20deg) translateY(-2px); }
-            100% { transform: rotate(-20deg) translateY(0); }
+            0% { transform: rotate(-25deg) translateY(0); }
+            25% { transform: rotate(-15deg) translateY(-1px); }
+            50% { transform: rotate(15deg) translateY(-2px); }
+            75% { transform: rotate(25deg) translateY(-1px); }
+            100% { transform: rotate(-25deg) translateY(0); }
         }
         /* Paw pads */
         .cat-leg::after {
@@ -466,18 +646,40 @@
             bottom: 2px;
             left: 50%;
             transform: translateX(-50%);
-            width: 4px;
-            height: 3px;
-            background: #ff69b4;
+            width: 5px;
+            height: 4px;
+            background: radial-gradient(ellipse, #ff69b4 0%, #ff5a9d 100%);
             border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
-        @keyframes legMove1 {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-5px) rotate(-15deg); }
+        /* Realistic walking animations */
+        @keyframes frontLegMove1 {
+            0% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(-20deg) translateX(2px); }
+            50% { transform: translateY(-4px) rotate(-10deg) translateX(1px); }
+            75% { transform: translateY(-2px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
         }
-        @keyframes legMove2 {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-5px) rotate(15deg); }
+        @keyframes frontLegMove2 {
+            0% { transform: translateY(-4px) rotate(-10deg) translateX(1px); }
+            25% { transform: translateY(-2px) rotate(5deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-8px) rotate(-20deg) translateX(2px); }
+            100% { transform: translateY(-4px) rotate(-10deg) translateX(1px); }
+        }
+        @keyframes backLegMove1 {
+            0% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-6px) rotate(15deg) translateX(-1px); }
+            50% { transform: translateY(-3px) rotate(8deg); }
+            75% { transform: translateY(-1px) rotate(-5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        @keyframes backLegMove2 {
+            0% { transform: translateY(-3px) rotate(8deg); }
+            25% { transform: translateY(-1px) rotate(-5deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-6px) rotate(15deg) translateX(-1px); }
+            100% { transform: translateY(-3px) rotate(8deg); }
         }
         .footer {
             background: #2d3748;
@@ -725,6 +927,24 @@
             setTimeout(() => sparkle.remove(), 1000);
         }
 
+        // Create paw print
+        function createPawPrint(x, y) {
+            const pawPrint = document.createElement('div');
+            pawPrint.className = 'paw-print';
+            const header = document.querySelector('.header');
+            pawPrint.style.left = x + 'px';
+            pawPrint.style.bottom = '5px';
+            
+            // Rotate based on direction
+            if (walkDirection === -1) {
+                pawPrint.style.transform = 'scaleX(-1)';
+            }
+            
+            header.appendChild(pawPrint);
+            
+            setTimeout(() => pawPrint.remove(), 3000);
+        }
+
         // Make cat purr
         function makePurr() {
             const catBody = document.querySelector('.cat-body');
@@ -820,116 +1040,201 @@
         // Cat walking behavior
         let isWalking = false;
         let walkDirection = 1; // 1 for right, -1 for left
-        let currentPosition = 5;
-        let headerWidth = 0;
-        let catWidth = 60; // Smaller cat width for better movement
+        let currentPosition = 0; // Will be set properly on load
+        let catWidth = 100; // Updated cat width to match new size
+        let hasPassedCenter = false; // Track if cat has passed center since last turn
         
-        // Update header width on window resize
-        function updateHeaderWidth() {
+        let leftBound = 0;
+        let rightBound = 0;
+
+        function updateBounds() {
             const header = document.querySelector('.header');
-            headerWidth = header.offsetWidth;
+            const panel = document.getElementById('diagram1');
+            const vw = panel.clientWidth; //header ? header.clientWidth : window.innerWidth;
+            if (!panel || panel.clientWidth === 0) {
+                leftBound = vw * 0.1;
+                rightBound = vw * 0.9 - catWidth;
+                return;
+            }
+            const headerRect = header.getBoundingClientRect();
+            const panelRect = panel.getBoundingClientRect();
+            const relativeLeft = panelRect.left - headerRect.left;
+            leftBound = relativeLeft + (panelRect.width * 0.1);
+            rightBound = relativeLeft + (panelRect.width * 0.9) - catWidth;
+            // Ensure bounds are valid
+            if (leftBound >= rightBound) {
+                leftBound = vw * 0.1;
+                rightBound = vw * 0.9 - catWidth;
+            }
+        }
+
+        // Initialize cat position
+        window.addEventListener('load', () => {
+            updateBounds();
+            const catContainer = document.querySelector('.running-cat-container');
+            if (catContainer) {
+                currentPosition = leftBound;
+                catContainer.style.left = currentPosition + 'px';
+                catContainer.style.display = 'block';
+            }
+        });
+        
+        function walk(rightBound, leftBound) {
+
+            return;
+
+            console.log(rightBound, leftBound, currentPosition);
+
+            if (!isWalking) return;
+
+            // Calculate step size (2-3% of walking area width)
+            const walkingWidth = rightBound - leftBound;
+            const stepPercent = 0.02 + Math.random() * 0.01;
+            const stepSize = Math.floor(walkingWidth * stepPercent) || 10; // Fallback min step
+            
+            // Calculate new position
+            let newPosition = currentPosition + (walkDirection * stepSize);
+            
+            // Define boundaries
+            // Already in leftBound and rightBound
+            
+            if (newPosition < leftBound) {
+                walkDirection = 1;
+                updateCatDirection();
+                newPosition = leftBound + stepSize;
+                hasPassedCenter = false;
+            } else if (newPosition > rightBound) {
+                walkDirection = -1;
+                updateCatDirection();
+                newPosition = rightBound - stepSize;
+                hasPassedCenter = false;
+            } else {
+                const middle = (leftBound + rightBound) / 2;
+                const crossingCenter = (walkDirection * (newPosition - middle)) < 0;
+                
+                if (crossingCenter && !hasPassedCenter) {
+                    hasPassedCenter = true;
+                }
+                
+                // Only allow turning if we haven't turned since passing center
+                if (!hasPassedCenter) {
+                    // Turn probability: f(x) = 2*|x|/L
+                    // At center (x=0): f(0) = 0
+                    // At edges (x=±L/2): f(±L/2) = 2*(L/2)/L = 1
+                    const turnProbability = 2 * Math.abs(newPosition - middle) / (rightBound - leftBound);
+                    
+                    if (Math.random() < turnProbability) {
+                        // Turn based on probability
+                        walkDirection *= -1;
+                        updateCatDirection();
+                        newPosition = currentPosition + (walkDirection * stepSize);
+                        hasPassedCenter = false; // Will be set true when actually crossing
+                    }
+                }
+            }
+            
+            currentPosition = Math.max(leftBound, Math.min(rightBound, newPosition));
+            catContainer.style.left = currentPosition + 'px';
+            
+            // Create paw prints
+            if (Math.random() > 0.5) {
+                createPawPrint(currentPosition + catWidth/2, catContainer.offsetTop + catContainer.offsetHeight - 5);
+            }
+            
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    if (isWalking) walk(rightBound, leftBound);
+                }, 100);
+            });
         }
         
-        // Initialize header width
-        updateHeaderWidth();
-        window.addEventListener('resize', updateHeaderWidth);
+        function updateCatDirection() {
+            const catElement = document.querySelector('.running-cat');
+            
+            if (walkDirection === -1) {
+                // Walking left - flip horizontally
+                catElement.style.transform = 'scaleX(-1)';
+            } else {
+                // Walking right - normal
+                catElement.style.transform = 'scaleX(1)';
+            }
+        }
         
         function startWalking() {
             if (isWalking) return;
             isWalking = true;
+            
             const catContainer = document.querySelector('.running-cat-container');
+            const catBody = document.querySelector('.cat-body');
+            const catHead = document.querySelector('.cat-head');
+            const catEars = document.querySelectorAll('.cat-ear-left, .cat-ear-right');
+            
+            // Make sure cat is visible
+            catContainer.style.display = 'block';
+            
             catContainer.classList.add('walking');
+            catBody.classList.add('walking');
+            catHead.classList.add('walking');
+            catEars.forEach(ear => ear.classList.add('walking'));
             
-            // Random direction if starting from left edge
-            if (currentPosition === 5) {
-                walkDirection = 1; // Start walking right
+            updateBounds();
+            
+            if (currentPosition < leftBound || currentPosition > rightBound) {
+                currentPosition = leftBound;
+                catContainer.style.left = currentPosition + 'px';
             }
             
-            // Calculate new position with larger steps
-            const stepSize = 3;
-            const newPosition = currentPosition + (walkDirection * stepSize);
+            walkDirection = 1;
+            updateCatDirection();
             
-            // Check if we're crossing the middle line
-            const middleLine = headerWidth / 2;
-            const isCrossingMiddle = (currentPosition < middleLine && newPosition >= middleLine) || 
-                                   (currentPosition > middleLine && newPosition <= middleLine);
-            
-            // Calculate turn probability based on distance from middle
-            const distanceFromMiddle = Math.abs(newPosition - middleLine);
-            const maxDistance = headerWidth / 2;
-            const turnProbability = Math.max(0.1, (maxDistance - distanceFromMiddle) / maxDistance * 0.8);
-            
-            // Turn back if crossing middle with probability, or if hitting edges
-            if ((isCrossingMiddle && Math.random() < turnProbability) || 
-                newPosition <= 5 || newPosition >= headerWidth - catWidth - 5) {
-                
-                walkDirection *= -1;
-                
-                // Mirror the entire cat (head and body)
-                const catElement = document.querySelector('.running-cat');
-                const catHead = document.querySelector('.cat-head');
-                const catBody = document.querySelector('.cat-body');
-                const catTail = document.querySelector('.cat-tail');
-                const catLegs = document.querySelectorAll('.cat-leg');
-                
-                if (walkDirection === -1) {
-                    // Walking left - mirror everything
-                    catElement.style.transform = 'scaleX(-1)';
-                    catHead.style.transform = 'scaleX(-1)';
-                    catBody.style.transform = 'scaleX(-1)';
-                    catTail.style.transform = 'scaleX(-1)';
-                    catLegs.forEach(leg => leg.style.transform = 'scaleX(-1)');
-                } else {
-                    // Walking right - normal orientation
-                    catElement.style.transform = 'scaleX(1)';
-                    catHead.style.transform = 'scaleX(1)';
-                    catBody.style.transform = 'scaleX(1)';
-                    catTail.style.transform = 'scaleX(1)';
-                    catLegs.forEach(leg => leg.style.transform = 'scaleX(1)');
-                }
-                
-                // Add a small pause when turning
-                setTimeout(() => {
-                    if (isWalking) {
-                        startWalking();
-                    }
-                }, 300);
-                return;
-            }
-            
-            currentPosition = newPosition;
-            catContainer.style.left = currentPosition + 'px';
-            
-            // Continue walking
-            setTimeout(() => {
-                if (isWalking) {
-                    startWalking();
-                }
-            }, 100);
+            walk(rightBound, leftBound);
         }
         
         function stopWalking() {
             isWalking = false;
             const catContainer = document.querySelector('.running-cat-container');
+            const catBody = document.querySelector('.cat-body');
+            const catHead = document.querySelector('.cat-head');
+            const catEars = document.querySelectorAll('.cat-ear-left, .cat-ear-right');
+            
             catContainer.classList.remove('walking');
+            catBody.classList.remove('walking');
+            catHead.classList.remove('walking');
+            catEars.forEach(ear => ear.classList.remove('walking'));
         }
         
-        // Start walking after a delay
-        setTimeout(() => {
-            startWalking();
-        }, 3000);
+        // Start walking after page fully loads
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                startWalking();
+            }, 500);
+        });
         
         // Randomly pause and resume for more natural behavior
         setInterval(() => {
-            if (isWalking && Math.random() > 0.8) {
+            if (isWalking && Math.random() > 0.6) { // 40% chance to stop
                 stopWalking();
+                
+                // Add idle animations
+                const catBody = document.querySelector('.cat-body');
+                const catTail = document.querySelector('.cat-tail');
+                catBody.classList.add('idle');
+                catTail.classList.add('idle');
+                
+                // Random idle duration
+                const idleDuration = Math.random() * 4000 + 2000; // 2-6 seconds
+                
                 setTimeout(() => {
-                    if (!isWalking) {
+                    catBody.classList.remove('idle');
+                    catTail.classList.remove('idle');
+                    if (!isWalking && Math.random() > 0.3) { // 70% chance to resume walking
                         startWalking();
                     }
-                }, Math.random() * 3000 + 2000);
+                }, idleDuration);
+            } else if (!isWalking && Math.random() > 0.5) { // 50% chance to start walking if idle
+                startWalking();
             }
-        }, 8000);
+        }, 3000); // Check every 3 seconds
         
         // Add hover effect for cat
         const catContainer = document.querySelector('.running-cat-container');
@@ -1028,6 +1333,7 @@
 
             // Run mermaid
             mermaid.run();
+            setTimeout(updateBounds, 500); // Give time for rendering
         }).catch(error => {
             console.error('Error loading diagrams:', error);
             document.querySelector('.markdown-body').innerHTML += `
@@ -1037,6 +1343,17 @@
                     <pre>${error}</pre>
                 </div>
             `;
+        });
+
+        // Add resize handler to clamp position
+        window.addEventListener('resize', () => {
+            updateBounds();
+            currentPosition = Math.max(leftBound, Math.min(rightBound, currentPosition));
+            
+            const catContainer = document.querySelector('.running-cat-container');
+            if (catContainer) {
+                catContainer.style.left = currentPosition + 'px';
+            }
         });
     </script>
 </body>
