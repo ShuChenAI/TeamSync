@@ -140,6 +140,156 @@
             font-size: 1.5rem;
         }
         
+        /* 響應式設計 - 平板 */
+        @media (max-width: 1024px) {
+            .header {
+                padding: 1rem 1.5rem;
+            }
+            
+            .zoom-controls {
+                bottom: 1.5rem;
+                left: 1.5rem;
+            }
+            
+            .hint {
+                bottom: 1.5rem;
+                right: 1.5rem;
+            }
+        }
+        
+        /* 響應式設計 - 手機 */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .title {
+                font-size: 1.25rem;
+            }
+            
+            .close-button {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                font-size: 1.25rem;
+            }
+            
+            .diagram-container {
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            #diagram-wrapper {
+                padding: 1rem;
+            }
+            
+            .zoom-controls {
+                bottom: 1rem;
+                left: 1rem;
+                flex-direction: column;
+                gap: 0.375rem;
+                padding: 0.375rem;
+                border-radius: 10px;
+            }
+            
+            .zoom-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1.125rem;
+                border-radius: 6px;
+            }
+            
+            .hint {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.5rem 0.875rem;
+                font-size: 0.75rem;
+                max-width: 180px;
+                text-align: center;
+                line-height: 1.4;
+            }
+            
+            /* 手機上隱藏網格背景 */
+            .diagram-scroll-area {
+                background-image: none;
+                background-color: #f5f5f5;
+            }
+        }
+        
+        /* 超小螢幕 */
+        @media (max-width: 480px) {
+            .header {
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .title {
+                font-size: 1.125rem;
+            }
+            
+            .close-button {
+                width: 36px;
+                height: 36px;
+                font-size: 1.125rem;
+            }
+            
+            .zoom-controls {
+                bottom: 0.75rem;
+                left: 0.75rem;
+                gap: 0.25rem;
+                padding: 0.25rem;
+            }
+            
+            .zoom-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            
+            .hint {
+                display: none; /* 在超小螢幕隱藏提示 */
+            }
+            
+            #diagram-wrapper {
+                padding: 0.5rem;
+                box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+            }
+        }
+        
+        /* 觸控設備優化 */
+        @media (hover: none) and (pointer: coarse) {
+            .close-button:active {
+                transform: scale(0.95);
+                background: #cbd5e0;
+            }
+            
+            .zoom-btn:active {
+                transform: scale(0.9);
+            }
+            
+            /* 觸控設備的提示文字 */
+            .hint {
+                content: "雙指縮放 | 滑動查看";
+            }
+        }
+        
+        /* 橫向模式優化 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                padding: 0.5rem 1rem;
+            }
+            
+            .zoom-controls {
+                flex-direction: row;
+                bottom: 0.5rem;
+                left: 0.5rem;
+            }
+            
+            .hint {
+                bottom: 0.5rem;
+                right: 0.5rem;
+            }
+        }
+        
         .hint {
             position: fixed;
             bottom: 2rem;
@@ -437,8 +587,95 @@
             });
         }
 
+        // 添加觸控手勢支援
+        function enableTouchGestures() {
+            const container = document.querySelector('.diagram-container');
+            const wrapper = document.getElementById('diagram-wrapper');
+            
+            let initialDistance = 0;
+            let initialScale = 1;
+            let isPinching = false;
+            
+            // 計算兩個觸點之間的距離
+            function getDistance(touches) {
+                const dx = touches[0].clientX - touches[1].clientX;
+                const dy = touches[0].clientY - touches[1].clientY;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+            
+            container.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    e.preventDefault();
+                    isPinching = true;
+                    initialDistance = getDistance(e.touches);
+                    initialScale = currentZoom;
+                }
+            }, { passive: false });
+            
+            container.addEventListener('touchmove', (e) => {
+                if (isPinching && e.touches.length === 2) {
+                    e.preventDefault();
+                    const currentDistance = getDistance(e.touches);
+                    const scale = (currentDistance / initialDistance) * initialScale;
+                    
+                    // 限制縮放範圍
+                    currentZoom = Math.max(0.2, Math.min(5, scale));
+                    wrapper.style.transform = `scale(${currentZoom})`;
+                }
+            }, { passive: false });
+            
+            container.addEventListener('touchend', (e) => {
+                if (e.touches.length < 2) {
+                    isPinching = false;
+                }
+            });
+            
+            // 雙擊放大/縮小
+            let lastTouchTime = 0;
+            container.addEventListener('touchend', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTouchTime;
+                if (tapLength < 300 && tapLength > 0) {
+                    e.preventDefault();
+                    // 雙擊時在放大和適應螢幕之間切換
+                    if (currentZoom > 1.1) {
+                        zoomDiagram('fit');
+                    } else {
+                        currentZoom = 2;
+                        wrapper.style.transform = `scale(${currentZoom})`;
+                    }
+                }
+                lastTouchTime = currentTime;
+            });
+        }
+        
+        // 檢測是否為觸控設備
+        function isTouchDevice() {
+            return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        }
+        
+        // 更新提示文字
+        function updateHintText() {
+            const hintElement = document.querySelector('.hint');
+            if (hintElement) {
+                if (isTouchDevice()) {
+                    hintElement.innerHTML = '💡 提示：雙指縮放 | 滑動查看 | 雙擊放大';
+                } else {
+                    hintElement.innerHTML = '💡 提示：拖曳移動圖表 | Ctrl/Cmd + 滾輪縮放';
+                }
+            }
+        }
+        
         // 載入時渲染圖表
         renderDiagram();
+        
+        // 初始化觸控手勢（如果是觸控設備）
+        if (isTouchDevice()) {
+            enableTouchGestures();
+        }
+        
+        // 更新提示文字
+        updateHintText();
         
         // 窗口關閉時清理 localStorage
         window.addEventListener('beforeunload', () => {
