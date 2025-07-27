@@ -4,104 +4,527 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeamSync Network Architecture - 數辰創藝科技</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.2.0/github-markdown.min.css">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
-        body {
-            box-sizing: border-box;
-            min-width: 200px;
-            max-width: 1200px;
-            margin: 0 auto;
+        * {
+            margin: 0;
             padding: 0;
-            background-color: #f6f8fa;
+            box-sizing: border-box;
         }
-        .header {
-            background: linear-gradient(135deg, #6b46c1 0%, #e53e3e 100%);
-            color: white;
-            padding: 30px 45px;
+
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --accent-color: #ff6b6b;
+            --text-dark: #2d3748;
+            --text-light: #718096;
+            --bg-light: #f7fafc;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --hover-transform: translateY(-5px);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* 動態背景 */
+        .animated-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--bg-light);
+            overflow: hidden;
+        }
+
+        .animated-background::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(240, 147, 251, 0.1) 0%, transparent 50%);
+            animation: gradientShift 20s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(90deg) scale(1.1); }
+            50% { transform: rotate(180deg) scale(1); }
+            75% { transform: rotate(270deg) scale(1.1); }
+        }
+
+        /* 導航列 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
             display: flex;
             align-items: center;
-            gap: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: visible;
-            min-height: 120px;
+            gap: 1rem;
         }
-        .logo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
+
+        .logo-container {
+            width: 50px;
+            height: 50px;
             background: white;
-            padding: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+            transition: transform 0.3s ease;
         }
-        .logo img {
+
+        .logo-container:hover {
+            transform: rotate(-10deg) scale(1.1);
+        }
+
+        .logo-container img {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
-        .company-info h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 600;
-            letter-spacing: 1px;
+
+        .company-name {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .company-info p {
-            margin: 5px 0 0 0;
-            font-size: 18px;
-            opacity: 0.9;
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
         }
-        .main-content {
-            padding: 45px;
+
+        .nav-link {
+            color: var(--text-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
         }
-        .markdown-body {
-            background-color: white;
-            padding: 45px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-            color: #000000 !important;
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
         }
-        .markdown-body h1,
-        .markdown-body h2,
-        .markdown-body h3,
-        .markdown-body h4,
-        .markdown-body h5,
-        .markdown-body h6,
-        .markdown-body p,
-        .markdown-body li,
-        .markdown-body td,
-        .markdown-body th {
-            color: #000000 !important;
+
+        .nav-link:hover::after {
+            width: 100%;
         }
+
+        /* Hero Section */
+        .hero-section {
+            margin-top: 82px;
+            min-height: 60vh;
+            background: var(--primary-gradient);
+            position: relative;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .hero-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255,255,255,.05) 35px, rgba(255,255,255,.05) 70px);
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease 0.2s;
+            animation-fill-mode: both;
+        }
+
+        .hero-description {
+            font-size: 1.125rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            line-height: 1.8;
+            animation: fadeInUp 0.8s ease 0.4s;
+            animation-fill-mode: both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 主要內容區 */
+        .main-container {
+            max-width: 1400px;
+            margin: -80px auto 0;
+            padding: 0 2rem 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 卡片網格 - 改為垂直排列 */
+        .cards-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+            margin-bottom: 4rem;
+        }
+
+        .diagram-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .diagram-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .diagram-card:hover {
+            transform: var(--hover-transform);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .diagram-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .card-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .card-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-gradient);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            flex-shrink: 0;
+        }
+
+        .card-description {
+            color: var(--text-light);
+            font-size: 1.125rem;
+            line-height: 1.7;
+            max-width: 800px;
+        }
+
         .mermaid {
+            margin: 2rem -1rem;
+            background: #f8f9fa;
+            padding: 3rem 2rem;
+            border-radius: 16px;
+            overflow-x: auto;
+            overflow-y: visible;
+            border: 1px solid #e9ecef;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 展開/收合按鈕 */
+        .expand-button {
+            position: absolute;
+            top: 2.5rem;
+            right: 2.5rem;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .expand-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .diagram-card.expanded .mermaid {
+            margin: 2rem -2.5rem;
+            padding: 4rem 3rem;
+            max-height: none;
+        }
+
+        /* 特色區塊 */
+        .features-section {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            margin-bottom: 4rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .features-title {
+            font-size: 2.5rem;
+            font-weight: 700;
             text-align: center;
-            margin: 30px 0;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            overflow: auto;
-            border: 2px solid #e1e4e8;
+            margin-bottom: 3rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .diagram-container {
-            margin: 40px 0;
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
         }
-        /* Running Cat Animation */
+
+        .feature-item {
+            text-align: center;
+            padding: 2rem;
+            border-radius: 16px;
+            background: var(--bg-light);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            background: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: var(--hover-transform);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: var(--secondary-gradient);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-description {
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* 頁尾 */
+        .footer {
+            background: var(--text-dark);
+            color: white;
+            margin-top: 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23f7fafc" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,133.3C960,128,1056,96,1152,96C1248,96,1344,128,1392,144L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path></svg>');
+            background-size: cover;
+            opacity: 0.05;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 4rem 2rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            line-height: 1.8;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* 精緻粉紅貓咪動畫 */
         .running-cat-container {
             position: absolute;
             bottom: 0;
-            left: 10%;
+            z-index: 100;
+            animation: catWalkAcross 20s linear infinite;
             cursor: pointer;
-            transition: left 0.1s linear;
-            z-index: 10;
-            display: none; /* Hide initially until position is set */
+            width: 100px;
+            height: 70px;
         }
-        /* Removed hover transform to avoid conflicts with direction flipping */
+
+        @keyframes catWalkAcross {
+            0% {
+                left: -120px;
+            }
+            45% {
+                left: calc(100% - 100px);
+            }
+            50% {
+                left: calc(100% - 100px);
+            }
+            95% {
+                left: -120px;
+            }
+            100% {
+                left: -120px;
+            }
+        }
+
         .running-cat {
             width: 100px;
             height: 70px;
             position: relative;
             transform-origin: center center;
             transition: transform 0.3s ease;
+            animation: catDirectionChange 20s linear infinite;
+        }
+
+        @keyframes catDirectionChange {
+            0%, 45% {
+                transform: scaleX(1);
+            }
+            50%, 95% {
+                transform: scaleX(-1);
+            }
+            100% {
+                transform: scaleX(1);
+            }
         }
 
         .cat-body {
@@ -119,8 +542,14 @@
             transition: transform 0.15s ease;
             position: relative;
             overflow: visible;
+            animation: bodyBob 0.5s ease-in-out infinite;
         }
-        /* Fur texture stripes */
+
+        @keyframes bodyBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+
         .cat-body::before {
             content: '';
             position: absolute;
@@ -136,14 +565,20 @@
             border-radius: inherit;
             opacity: 0.5;
         }
+
         .cat-body.walking {
-            animation: bodyBob 0.4s ease-in-out infinite;
+            animation: bodyWalk 1s ease-in-out infinite;
         }
-        @keyframes bodyBob {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-1px) rotate(-1deg); }
-            75% { transform: translateY(-1px) rotate(1deg); }
+
+        @keyframes bodyWalk {
+            0%, 100% { 
+                transform: rotate(0deg) scaleY(1);
+            }
+            50% { 
+                transform: rotate(1deg) scaleY(0.95);
+            }
         }
+
         .cat-head {
             position: absolute;
             width: 45px;
@@ -159,15 +594,17 @@
                 inset 3px 2px 8px rgba(255, 255, 255, 0.3);
             transition: transform 0.15s ease;
         }
+
         .cat-head.walking {
             animation: headBob 0.4s ease-in-out infinite;
         }
+
         @keyframes headBob {
             0%, 100% { transform: translateY(0) rotate(0deg); }
             25% { transform: translateY(-1px) rotate(-2deg); }
             75% { transform: translateY(-1px) rotate(2deg); }
         }
-        /* Fur markings on head */
+
         .cat-head::before {
             content: '';
             position: absolute;
@@ -179,7 +616,7 @@
                 radial-gradient(ellipse 6px 10px at 50% 5%, rgba(255, 140, 180, 0.1) 0%, transparent 50%);
             border-radius: inherit;
         }
-        /* Light reflection */
+
         .cat-head::after {
             content: '';
             position: absolute;
@@ -193,10 +630,12 @@
             animation: shine 3s ease-in-out infinite;
             mix-blend-mode: overlay;
         }
+
         @keyframes shine {
             0%, 100% { opacity: 0.4; }
             50% { opacity: 0.7; }
         }
+
         .cat-ear-left,
         .cat-ear-right {
             position: absolute;
@@ -210,15 +649,17 @@
                 inset 1px 1px 3px rgba(255, 255, 255, 0.3);
             transform-origin: bottom center;
         }
+
         .cat-ear-left {
             left: 6px;
             transform: rotate(-25deg);
         }
+
         .cat-ear-right {
             right: 6px;
             transform: rotate(25deg) scaleX(-1);
         }
-        /* Inner ear */
+
         .cat-ear-left::after,
         .cat-ear-right::after {
             content: '';
@@ -231,20 +672,7 @@
             left: 4px;
             opacity: 0.7;
         }
-        .cat-ear-left.walking,
-        .cat-ear-right.walking {
-            animation: earTwitch 2s ease-in-out infinite;
-        }
-        @keyframes earTwitch {
-            0%, 100% { transform: rotate(-25deg) scale(1); }
-            10% { transform: rotate(-28deg) scale(0.95); }
-            15% { transform: rotate(-23deg) scale(1.02); }
-        }
-        @keyframes earTwitchRight {
-            0%, 100% { transform: rotate(25deg) scaleX(-1) scale(1); }
-            10% { transform: rotate(28deg) scaleX(-1) scale(0.95); }
-            15% { transform: rotate(23deg) scaleX(-1) scale(1.02); }
-        }
+
         .cat-tail {
             position: absolute;
             width: 40px;
@@ -261,7 +689,7 @@
             transition: transform 0.2s ease;
             z-index: -1;
         }
-        /* Tail fur markings */
+
         .cat-tail::before {
             content: '';
             position: absolute;
@@ -276,52 +704,98 @@
             );
             border-radius: inherit;
         }
-        .cat-tail::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: radial-gradient(circle, #ffc0d9 0%, #ffb3d0 100%);
-            border-radius: 50%;
-            right: 3px;
-            top: 5px;
-            box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.3);
+
+        @keyframes tailWag {
+            0% { transform: rotate(-25deg) translateY(0); }
+            25% { transform: rotate(-15deg) translateY(-1px); }
+            50% { transform: rotate(15deg) translateY(-2px); }
+            75% { transform: rotate(25deg) translateY(-1px); }
+            100% { transform: rotate(-25deg) translateY(0); }
         }
+
         .cat-leg {
             position: absolute;
             width: 12px;
             height: 18px;
             background: linear-gradient(to bottom, #ffb3d0 0%, #ffc0d9 70%, #ffa8c9 100%);
             border-radius: 40% 40% 50% 50% / 30% 30% 60% 60%;
-            bottom: 0;
+            bottom: -3px;
             box-shadow: 
                 0 2px 4px rgba(255, 182, 193, 0.3),
                 inset 1px 0 2px rgba(255, 255, 255, 0.2);
             transition: transform 0.15s ease;
             transform-origin: top center;
         }
-        /* Front legs */
+
+        .cat-leg::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 4px;
+            background: radial-gradient(ellipse, #ff69b4 0%, #ff5a9d 100%);
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
         .cat-leg1 {
             left: 25px;
             animation: frontLegMove1 0.4s ease-in-out infinite;
             z-index: 2;
         }
+
         .cat-leg2 {
             left: 38px;
             animation: frontLegMove2 0.4s ease-in-out infinite;
             z-index: 1;
         }
-        /* Back legs */
+
         .cat-leg3 {
             left: 48px;
             animation: backLegMove1 0.4s ease-in-out infinite;
             height: 16px;
         }
+
         .cat-leg4 {
             left: 60px;
             animation: backLegMove2 0.4s ease-in-out infinite;
             height: 16px;
         }
+
+        @keyframes frontLegMove1 {
+            0% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(-20deg) translateX(2px); }
+            50% { transform: translateY(-4px) rotate(-10deg) translateX(1px); }
+            75% { transform: translateY(-2px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        @keyframes frontLegMove2 {
+            0% { transform: translateY(-4px) rotate(-10deg) translateX(1px); }
+            25% { transform: translateY(-2px) rotate(5deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-8px) rotate(-20deg) translateX(2px); }
+            100% { transform: translateY(-4px) rotate(-10deg) translateX(1px); }
+        }
+
+        @keyframes backLegMove1 {
+            0% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-6px) rotate(15deg) translateX(-1px); }
+            50% { transform: translateY(-3px) rotate(8deg); }
+            75% { transform: translateY(-1px) rotate(-5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        @keyframes backLegMove2 {
+            0% { transform: translateY(-3px) rotate(8deg); }
+            25% { transform: translateY(-1px) rotate(-5deg); }
+            50% { transform: translateY(0) rotate(0deg); }
+            75% { transform: translateY(-6px) rotate(15deg) translateX(-1px); }
+            100% { transform: translateY(-3px) rotate(8deg); }
+        }
+
         .cat-eye {
             position: absolute;
             width: 10px;
@@ -332,7 +806,7 @@
             animation: blink 5s infinite;
             overflow: hidden;
         }
-        /* Simple pupil */
+
         .cat-eye::after {
             content: '';
             position: absolute;
@@ -343,23 +817,15 @@
             top: 2px;
             right: 2px;
         }
-        /* Light reflection */
-        .eye-shine {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: radial-gradient(circle, #fff 0%, rgba(255,255,255,0.9) 50%, transparent 100%);
-            border-radius: 50%;
-            top: 3px;
-            right: 3px;
-            pointer-events: none;
-        }
+
         .cat-eye-left {
             left: 10px;
         }
+
         .cat-eye-right {
             right: 10px;
         }
+
         @keyframes blink {
             0%, 90%, 100% { 
                 transform: scaleY(1);
@@ -368,6 +834,7 @@
                 transform: scaleY(0.1);
             }
         }
+
         .cat-nose {
             position: absolute;
             width: 0;
@@ -379,6 +846,7 @@
             left: 50%;
             transform: translateX(-50%);
         }
+
         .cat-cheek-left,
         .cat-cheek-right {
             position: absolute;
@@ -388,12 +856,15 @@
             border-radius: 50%;
             top: 18px;
         }
+
         .cat-cheek-left {
             left: 0;
         }
+
         .cat-cheek-right {
             right: 0;
         }
+
         .cat-whisker {
             position: absolute;
             width: 12px;
@@ -401,24 +872,29 @@
             background: rgba(0, 0, 0, 0.3);
             top: 22px;
         }
+
         .cat-whisker-left1 {
             left: -5px;
             transform: rotate(10deg);
         }
+
         .cat-whisker-left2 {
             left: -5px;
             top: 25px;
             transform: rotate(-10deg);
         }
+
         .cat-whisker-right1 {
             right: -5px;
             transform: rotate(-10deg);
         }
+
         .cat-whisker-right2 {
             right: -5px;
             top: 25px;
             transform: rotate(10deg);
         }
+
         .cat-mouth {
             position: absolute;
             width: 1px;
@@ -428,6 +904,7 @@
             left: 50%;
             transform: translateX(-50%);
         }
+
         .speech-bubble {
             position: absolute;
             background: linear-gradient(135deg, #fff 0%, #ffe0f0 100%);
@@ -447,7 +924,35 @@
             color: #000000;
         }
 
-        /* Heart particles */
+        .speech-bubble:before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            right: 20px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid #ffb3d0;
+        }
+
+        .speech-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 21px;
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-top: 7px solid #ffe0f0;
+        }
+
+        .running-cat-container:hover .speech-bubble {
+            opacity: 1;
+        }
+
+        /* 特效 */
         .heart-particle {
             position: absolute;
             font-size: 20px;
@@ -455,6 +960,7 @@
             pointer-events: none;
             z-index: 1001;
         }
+
         @keyframes floatUp {
             0% {
                 opacity: 1;
@@ -465,7 +971,7 @@
                 transform: translateY(-100px) scale(1.5) rotate(360deg);
             }
         }
-        /* Sparkle effect */
+
         .sparkle {
             position: absolute;
             width: 4px;
@@ -475,6 +981,7 @@
             animation: sparkle 1s ease-out forwards;
             pointer-events: none;
         }
+
         @keyframes sparkle {
             0% {
                 opacity: 1;
@@ -489,54 +996,7 @@
                 transform: scale(0) rotate(360deg);
             }
         }
-        /* Purr animation */
-        .cat-body.purring {
-            animation: purr 0.2s ease-in-out infinite;
-        }
-        @keyframes purr {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-1px); }
-            75% { transform: translateX(1px); }
-        }
-        /* Idle breathing animation */
-        .cat-body.idle {
-            animation: breathing 2s ease-in-out infinite;
-        }
-        @keyframes breathing {
-            0%, 100% { 
-                transform: scale(1, 1);
-            }
-            50% { 
-                transform: scale(1.02, 0.98);
-            }
-        }
-        .cat-tail.idle {
-            animation: tailSwish 3s ease-in-out infinite;
-        }
-        @keyframes tailSwish {
-            0%, 100% { transform: rotate(-25deg); }
-            25% { transform: rotate(-30deg); }
-            50% { transform: rotate(-20deg); }
-            75% { transform: rotate(-28deg); }
-        }
-        /* Rainbow trail */
-        .rainbow-trail {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
-            opacity: 0.6;
-            animation: fadeOut 1s ease-out forwards;
-            pointer-events: none;
-        }
-        @keyframes fadeOut {
-            to { 
-                opacity: 0;
-                transform: scale(0.5);
-            }
-        }
-        /* Paw print trail */
+
         .paw-print {
             position: absolute;
             width: 15px;
@@ -546,6 +1006,7 @@
             pointer-events: none;
             z-index: 1;
         }
+
         .paw-print::before {
             content: '';
             position: absolute;
@@ -557,7 +1018,7 @@
             left: 50%;
             transform: translateX(-50%);
         }
-        /* Toe prints */
+
         .paw-print::after {
             content: '';
             position: absolute;
@@ -573,6 +1034,7 @@
                 2.5px -5px 0 0.8px rgba(255, 179, 208, 0.4),
                 7.5px -5px 0 0.8px rgba(255, 179, 208, 0.4);
         }
+
         @keyframes pawFade {
             0% { 
                 opacity: 0.3;
@@ -583,202 +1045,226 @@
                 transform: scale(0.8);
             }
         }
-        .speech-bubble:before {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            right: 20px;
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-top: 8px solid #ffb3d0;
+
+        .cat-body.purring {
+            animation: purr 0.2s ease-in-out infinite;
         }
-        .speech-bubble:after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            right: 21px;
-            width: 0;
-            height: 0;
-            border-left: 7px solid transparent;
-            border-right: 7px solid transparent;
-            border-top: 7px solid #ffe0f0;
+
+        @keyframes purr {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-1px); }
+            75% { transform: translateX(1px); }
         }
-        /* Walking animation */
-        .running-cat-container.walking {
-            animation: walking 0.3s ease-in-out infinite;
+
+        /* 全螢幕模式 */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
         }
-        @keyframes walking {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-3px); }
+
+        .fullscreen-overlay.active {
+            display: flex;
         }
-        /* Eye follow cursor */
-        .cat-eye-pupil {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #000;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.1s ease;
+
+        .fullscreen-content {
+            background: white;
+            border-radius: 20px;
+            width: 95%;
+            height: 90%;
+            max-width: 1600px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        .running-cat-container:hover .speech-bubble {
-            opacity: 1;
+
+        .fullscreen-header {
+            padding: 2rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        @keyframes catRun {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(5px); }
+
+        .fullscreen-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0;
         }
-        @keyframes tailWag {
-            0% { transform: rotate(-25deg) translateY(0); }
-            25% { transform: rotate(-15deg) translateY(-1px); }
-            50% { transform: rotate(15deg) translateY(-2px); }
-            75% { transform: rotate(25deg) translateY(-1px); }
-            100% { transform: rotate(-25deg) translateY(0); }
+
+        .close-button {
+            background: #f7fafc;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        /* Paw pads */
-        .cat-leg::after {
-            content: '';
-            position: absolute;
-            bottom: 2px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 5px;
-            height: 4px;
-            background: radial-gradient(ellipse, #ff69b4 0%, #ff5a9d 100%);
-            border-radius: 50%;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+
+        .close-button:hover {
+            background: #e2e8f0;
+            transform: rotate(90deg);
         }
-        /* Realistic walking animations */
-        @keyframes frontLegMove1 {
-            0% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-8px) rotate(-20deg) translateX(2px); }
-            50% { transform: translateY(-4px) rotate(-10deg) translateX(1px); }
-            75% { transform: translateY(-2px) rotate(5deg); }
-            100% { transform: translateY(0) rotate(0deg); }
+
+        .fullscreen-diagram {
+            flex: 1;
+            padding: 2rem;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f8f9fa;
         }
-        @keyframes frontLegMove2 {
-            0% { transform: translateY(-4px) rotate(-10deg) translateX(1px); }
-            25% { transform: translateY(-2px) rotate(5deg); }
-            50% { transform: translateY(0) rotate(0deg); }
-            75% { transform: translateY(-8px) rotate(-20deg) translateX(2px); }
-            100% { transform: translateY(-4px) rotate(-10deg) translateX(1px); }
+
+        .fullscreen-diagram svg {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto !important;
+            height: auto !important;
         }
-        @keyframes backLegMove1 {
-            0% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-6px) rotate(15deg) translateX(-1px); }
-            50% { transform: translateY(-3px) rotate(8deg); }
-            75% { transform: translateY(-1px) rotate(-5deg); }
-            100% { transform: translateY(0) rotate(0deg); }
+
+        .mermaid-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
         }
-        @keyframes backLegMove2 {
-            0% { transform: translateY(-3px) rotate(8deg); }
-            25% { transform: translateY(-1px) rotate(-5deg); }
-            50% { transform: translateY(0) rotate(0deg); }
-            75% { transform: translateY(-6px) rotate(15deg) translateX(-1px); }
-            100% { transform: translateY(-3px) rotate(8deg); }
+
+        /* 確保 Mermaid 圖表在全螢幕時正確顯示 */
+        #fullscreen-overlay .mermaid {
+            max-width: 95vw;
+            max-height: 80vh;
+            overflow: visible;
+            background: transparent;
+            border: none;
+            padding: 0;
+            margin: 0;
         }
-        .footer {
-            background: #2d3748;
-            color: white;
-            padding: 40px 45px;
-            margin-top: 60px;
+
+        #fullscreen-overlay .mermaid svg {
+            max-width: 100%;
+            max-height: 100%;
         }
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
+        
+        .fullscreen-diagram pre.mermaid {
+            background: transparent;
+            border: none;
+            margin: 0;
+            padding: 0;
         }
-        .footer-section h3 {
-            margin: 0 0 15px 0;
-            color: #f7fafc;
-            font-size: 18px;
-        }
-        .footer-section p,
-        .footer-section a {
-            margin: 8px 0;
-            color: #e2e8f0;
-            text-decoration: none;
-            line-height: 1.6;
-        }
-        .footer-section a:hover {
-            color: #ffffff;
-            text-decoration: underline;
-        }
-        .footer-bottom {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 1px solid #4a5568;
-            color: #a0aec0;
-        }
-        @media (max-width: 767px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-                padding: 20px;
+
+        @media (max-width: 768px) {
+            .navbar-content {
+                padding: 1rem;
             }
-            .logo {
-                width: 60px;
-                height: 60px;
+            
+            .nav-links {
+                display: none;
             }
-            .company-info h1 {
-                font-size: 22px;
+            
+            .hero-title {
+                font-size: 2rem;
             }
-            .company-info p {
-                font-size: 16px;
+            
+            .hero-content {
+                padding: 3rem 1.5rem;
             }
-            .main-content {
-                padding: 15px;
+            
+            .main-container {
+                padding: 0 1rem 2rem;
             }
-            .markdown-body {
-                padding: 20px;
+            
+            .diagram-card {
+                padding: 1.5rem;
             }
-            .footer {
-                padding: 30px 20px;
+            
+            .features-section {
+                padding: 2rem 1.5rem;
             }
+            
             .running-cat-container {
-                position: absolute;
-                bottom: 0;
-                left: 5px;
-                transform: scale(0.6);
+                transform: scale(0.8);
             }
-            .running-cat-container:hover {
-                transform: scale(0.7);
+        }
+
+        /* 載入動畫 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
-            .speech-bubble {
-                font-size: 10px;
-                padding: 6px 10px;
-                bottom: 50px;
-                right: -5px;
-            }
-            .header {
-                flex-wrap: wrap;
-                justify-content: center;
-                position: relative;
-            }
-            .company-info {
-                text-align: center;
-                margin-bottom: 10px;
-            }
+        }
+
+        /* 滾動效果 */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .scroll-animate.show {
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="logo">
-            <img src="logo.jpg" alt="數辰創藝科技 Logo">
+    <!-- 動態背景 -->
+    <div class="animated-background"></div>
+
+    <!-- 導航列 -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo-section">
+                <div class="logo-container">
+                    <img src="logo.jpg" alt="數辰創藝科技 Logo">
+                </div>
+                <div class="company-name">數辰創藝科技</div>
+            </div>
+            <div class="nav-links">
+                <a href="#architecture" class="nav-link">系統架構</a>
+                <a href="#features" class="nav-link">核心功能</a>
+                <a href="#contact" class="nav-link">聯絡我們</a>
+            </div>
         </div>
-        <div class="company-info">
-            <h1>數辰創藝科技股份有限公司</h1>
-            <p>TeamSync Network Architecture Documentation</p>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-pattern"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">TeamSync Network Architecture</h1>
+            <h2 class="hero-subtitle">智能化團隊協作平台</h2>
+            <p class="hero-description">
+                本文件詳細展示 TeamSync 後端系統的網路通訊架構，包含行動前端與後端的安全互動機制、
+                AI 工作流程的智能處理，以及 Jitsi 視訊會議與即時智能轉錄系統的完整整合方案。
+            </p>
         </div>
-        <!-- Running Cat Animation -->
+        <!-- 精緻粉紅貓咪動畫 -->
         <div class="running-cat-container" onclick="catSpeak()">
             <div class="running-cat">
                 <div class="cat-tail"></div>
@@ -804,98 +1290,251 @@
             </div>
             <div class="speech-bubble" id="catSpeech">喵~ 點我會有驚喜! 💖</div>
         </div>
-    </header>
+    </section>
+
+    <!-- 主要內容 -->
+    <main class="main-container">
+        <!-- 架構圖卡片 -->
+        <div class="cards-grid" id="architecture">
+            <div class="diagram-card fade-in">
+                <div class="card-header">
+                    <div class="card-info">
+                        <h2 class="card-title">
+                            <div class="card-icon">🌐</div>
+                            網路架構圖（含 RPA 整合）
+                        </h2>
+                        <p class="card-description">
+                            完整展示系統的網路拓撲結構，包含防火牆配置、負載均衡、微服務架構，
+                            以及 RPA 自動化流程的整合方式。透過此架構圖，您可以清楚了解系統各組件之間的連接關係，
+                            以及資料在不同層級之間的流動方式。
+                        </p>
+                    </div>
+                    <button class="expand-button" onclick="toggleExpand(this)">全螢幕檢視</button>
+                </div>
+                <div id="diagram1" class="mermaid">
+graph LR
+    subgraph "外部網路"
+        A[Frontend App<br/>React Native/Flutter]
+        B[Media Stream<br/>UDP:10000]
+    end
     
-    <div class="main-content">
-        <div class="markdown-body">
-        <h1>TeamSync 網路通訊流程圖</h1>
+    subgraph "共享網"
+        C[防火牆<br/>Nginx/HAProxy]
+        D[Reverse Proxy<br/>:443→:8888]
+    end
+    
+    subgraph "核心後端服務"
+        E[FastAPI Backend<br/>Port 8888]
+        F[Jitsi<br/>視訊服務器]
+    end
+    
+    subgraph "資料層"
+        G[(Database<br/>PostgreSQL)]
+        H[Cache<br/>Redis]
+    end
+    
+    subgraph "RPA 整合"
+        I[RPA Controller]
+        J[Task Queue<br/>Celery]
+        K[Worker Nodes]
+    end
+    
+    A -->|HTTPS/WSS| C
+    B -->|Video/WebRTC| C
+    C --> D
+    D --> E
+    C --> F
+    E --> G
+    E --> H
+    E --> I
+    I --> J
+    J --> K
+    K -->|自動化任務| G
+                </div>
+            </div>
 
-        <h2>系統架構概覽</h2>
-        <p>本文件描述 TeamSync 後端系統的網路通訊架構，展示行動前端如何通過防火牆與後端互動，以及 AI 工作流程如何安全地訪問內部資料庫和企業系統。</p>
-
-
-        <h2>網路架構圖（含 RPA 整合）</h2>
-        <div class="diagram-container">
-            <div id="diagram1" class="mermaid"></div>
+            <div class="diagram-card fade-in">
+                <div class="card-header">
+                    <div class="card-info">
+                        <h2 class="card-title">
+                            <div class="card-icon">🎥</div>
+                            視訊會議與轉錄整合架構
+                        </h2>
+                        <p class="card-description">
+                            深入解析 Jitsi 視訊會議系統與 AI 即時轉錄服務的整合架構，
+                            展示語音流處理、即時轉換及智能分析的完整流程。這個架構確保了高品質的視訊通話體驗，
+                            同時提供準確的即時字幕和會議記錄功能。
+                        </p>
+                    </div>
+                    <button class="expand-button" onclick="toggleExpand(this)">全螢幕檢視</button>
+                </div>
+                <div id="diagram2" class="mermaid">
+sequenceDiagram
+    participant U as 用戶
+    participant F as Frontend
+    participant J as Jitsi Server
+    participant T as 轉錄服務
+    participant AI as AI 分析引擎
+    participant DB as 資料庫
+    
+    U->>F: 加入會議
+    F->>J: 建立 WebRTC 連接
+    J->>F: 視訊串流
+    
+    par 即時處理
+        J->>T: 音訊串流
+        T->>AI: 語音轉文字
+        AI->>F: 即時字幕
+    and 會議錄製
+        J->>DB: 儲存錄影
+    end
+    
+    AI->>DB: 儲存轉錄文本
+    AI->>DB: 儲存會議摘要
+    
+    U->>F: 結束會議
+    F->>J: 斷開連接
+    AI->>U: 發送會議記錄
+                </div>
+            </div>
         </div>
 
-        <h2>TeamSync 視訊會議與智能轉錄功能架構</h2>
-        <p>本節詳細說明 TeamSync 的進階功能：Jitsi 視訊會議整合與即時智能轉錄系統。</p>
+        <!-- 核心功能區塊 -->
+        <section class="features-section scroll-animate" id="features">
+            <h2 class="features-title">TeamSync 核心功能</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">高效能架構</h3>
+                    <p class="feature-description">
+                        採用 FastAPI 框架構建的高性能後端，支援非同步處理與即時通訊，
+                        確保系統在高並發情況下的穩定運行。
+                    </p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI 智能整合</h3>
+                    <p class="feature-description">
+                        整合 LangChain 與向量資料庫，提供智能化的文件檢索、
+                        自然語言處理及個性化推薦功能。
+                    </p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">企業級安全</h3>
+                    <p class="feature-description">
+                        多層次安全防護機制，包含 JWT 認證、資料加密傳輸、
+                        以及完善的權限管理系統。
+                    </p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">☁️</div>
+                    <h3 class="feature-title">雲原生部署</h3>
+                    <p class="feature-description">
+                        基於 Docker 容器化技術，支援 AWS ECS 自動擴展，
+                        配合 Cloudflare CDN 提供全球化服務。
+                    </p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">即時數據分析</h3>
+                    <p class="feature-description">
+                        即時監控系統運行狀態，提供豐富的數據視覺化報表，
+                        協助管理者做出明智決策。
+                    </p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">無縫整合</h3>
+                    <p class="feature-description">
+                        支援與企業現有系統的無縫整合，提供完整的 API 文件
+                        與 SDK，降低開發成本。
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
 
-        <h3>視訊會議與轉錄整合架構圖</h3>
-        <div class="diagram-container">
-            <div id="diagram2" class="mermaid"></div>
-        </div>
-    </div>
-
-    <footer class="footer">
+    <!-- 頁尾 -->
+    <footer class="footer" id="contact">
         <div class="footer-content">
-            <div class="footer-section">
-                <h3>關於我們</h3>
-                <p>數辰創藝科技股份有限公司</p>
-                <p>專注於提供創新的 TeamSync 解決方案</p>
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>關於我們</h3>
+                    <p>數辰創藝科技股份有限公司</p>
+                    <p>致力於提供創新的 TeamSync 解決方案，協助企業實現數位轉型，提升團隊協作效率。</p>
+                </div>
+                <div class="footer-section">
+                    <h3>聯絡資訊</h3>
+                    <p>📧 <a href="mailto:scxai@shuchenai.com">scxai@shuchenai.com</a></p>
+                    <p>📞 <a href="tel:+886-2-7748-0805">+886-2-7748-0805</a></p>
+                    <p>🌐 <a href="https://www.shuchenai.com" target="_blank">www.shuchenai.com</a></p>
+                </div>
+                <div class="footer-section">
+                    <h3>公司地址</h3>
+                    <p>📍 220 新北市板橋區縣民大道二段7號27樓A3</p>
+                    <p>📍 105 台北市松山區敦化南路一段2號14樓D室</p>
+                </div>
+                <div class="footer-section">
+                    <h3>服務項目</h3>
+                    <p><a href="#">TeamSync 企業協作平台</a></p>
+                    <p><a href="#">AI 智能轉錄服務</a></p>
+                    <p><a href="#">客製化開發方案</a></p>
+                </div>
             </div>
-            <div class="footer-section">
-                <h3>聯絡資訊</h3>
-                <p>📧 Email: <a href="mailto:scxai@shuchenai.com">scxai@shuchenai.com</a></p>
-                <p>📞 電話: <a href="tel:+886-2-7748-0805">+886-2-7748-0805</a></p>
+            <div class="footer-bottom">
+                <p>&copy; 2024 數辰創藝科技股份有限公司. All rights reserved.</p>
             </div>
-            <div class="footer-section">
-                <h3>公司地址</h3>
-                <p>📍 台北市松山區敦化南路一段2號14樓D室</p>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 數辰創藝科技股份有限公司. All rights reserved.</p>
         </div>
     </footer>
 
     <script>
-        // Initialize mermaid with black text theme
+        // Initialize mermaid with modern theme
         mermaid.initialize({ 
             startOnLoad: false,
             theme: 'base',
             themeVariables: {
                 primaryColor: '#e8f4ff',
-                primaryTextColor: '#000000',
-                primaryBorderColor: '#2188ff',
-                lineColor: '#000000',
-                secondaryColor: '#f6f8fa',
+                primaryTextColor: '#2d3748',
+                primaryBorderColor: '#667eea',
+                lineColor: '#4a5568',
+                secondaryColor: '#f7fafc',
                 tertiaryColor: '#fafbfc',
                 background: '#ffffff',
                 mainBkg: '#e8f4ff',
-                secondBkg: '#f6f8fa',
+                secondBkg: '#f7fafc',
                 tertiaryBkg: '#fafbfc',
-                primaryTextColor: '#000000',
-                secondaryTextColor: '#000000',
-                tertiaryTextColor: '#000000',
-                lineColor: '#333333',
-                textColor: '#000000',
-                mainContrastColor: '#000000',
-                darkTextColor: '#000000',
-                border1: '#2188ff',
-                border2: '#0366d6',
-                arrowheadColor: '#333333',
+                primaryTextColor: '#2d3748',
+                secondaryTextColor: '#4a5568',
+                tertiaryTextColor: '#718096',
+                lineColor: '#cbd5e0',
+                textColor: '#2d3748',
+                mainContrastColor: '#2d3748',
+                darkTextColor: '#2d3748',
+                border1: '#667eea',
+                border2: '#764ba2',
+                arrowheadColor: '#4a5568',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
                 fontSize: '16px',
                 labelBackground: '#ffffff',
                 edgeLabelBackground: '#ffffff',
-                actorTextColor: '#000000',
-                signalTextColor: '#000000',
+                actorTextColor: '#2d3748',
+                signalTextColor: '#2d3748',
                 noteBkgColor: '#fffacd',
-                noteTextColor: '#000000'
-            }
+                noteTextColor: '#2d3748'
+            },
+            securityLevel: 'loose' // 允許更靈活的渲染
         });
 
-        // Cat speaking messages
+        // 貓咪說話訊息
         const catMessages = [
             "喵~ 點我會有驚喜! 💖",
-            "這個系統設計真棒! 😸",
-            "我喜歡 TeamSync! 🐾",
+            "TeamSync 系統設計真棒! 😸",
+            "我喜歡數辰創藝科技! 🐾",
             "摸摸我會呼嚕嚕~ 😊",
             "需要我幫忙嗎? 😺",
             "喵嗚~ 我是粉紅貓貓! 🌸",
-            "讓我們一起寫程式吧! 💻",
+            "讓我們一起創新吧! 💻",
             "我會發光哦! ✨",
             "數辰創藝科技加油! 🎉",
             "給你一個愛心! 💕"
@@ -903,7 +1542,7 @@
 
         let messageIndex = 0;
 
-        // Create heart particle
+        // 創建愛心粒子
         function createHeart(x, y) {
             const heart = document.createElement('div');
             heart.className = 'heart-particle';
@@ -916,7 +1555,7 @@
             setTimeout(() => heart.remove(), 2000);
         }
 
-        // Create sparkle
+        // 創建閃光
         function createSparkle(x, y) {
             const sparkle = document.createElement('div');
             sparkle.className = 'sparkle';
@@ -927,25 +1566,7 @@
             setTimeout(() => sparkle.remove(), 1000);
         }
 
-        // Create paw print
-        function createPawPrint(x, y) {
-            const pawPrint = document.createElement('div');
-            pawPrint.className = 'paw-print';
-            const header = document.querySelector('.header');
-            pawPrint.style.left = x + 'px';
-            pawPrint.style.bottom = '5px';
-            
-            // Rotate based on direction
-            if (walkDirection === -1) {
-                pawPrint.style.transform = 'scaleX(-1)';
-            }
-            
-            header.appendChild(pawPrint);
-            
-            setTimeout(() => pawPrint.remove(), 3000);
-        }
-
-        // Make cat purr
+        // 讓貓咪發出呼嚕聲
         function makePurr() {
             const catBody = document.querySelector('.cat-body');
             catBody.classList.add('purring');
@@ -963,7 +1584,7 @@
             messageIndex = (messageIndex + 1) % catMessages.length;
             speechBubble.textContent = catMessages[messageIndex];
             
-            // Create multiple hearts
+            // 創建多個愛心
             for (let i = 0; i < 3; i++) {
                 setTimeout(() => {
                     createHeart(
@@ -973,7 +1594,7 @@
                 }, i * 200);
             }
             
-            // Create sparkles
+            // 創建閃光
             for (let i = 0; i < 5; i++) {
                 setTimeout(() => {
                     createSparkle(
@@ -983,16 +1604,10 @@
                 }, i * 100);
             }
             
-            // Make cat purr
+            // 讓貓咪發出呼嚕聲
             makePurr();
             
-            // Add walking animation
-            catContainer.classList.add('walking');
-            setTimeout(() => {
-                catContainer.classList.remove('walking');
-            }, 3000);
-            
-            // Jump animation (smaller jump since on ground)
+            // 跳躍動畫
             const originalTransform = catContainer.style.transform;
             catContainer.style.transform = 'translateY(-20px) scale(1.1)';
             
@@ -1001,269 +1616,217 @@
             }, 500);
         }
 
-        // Add eye tracking
-        function trackMouse(e) {
-            const eyes = document.querySelectorAll('.cat-eye');
-            const header = document.querySelector('.header');
-            const headerRect = header.getBoundingClientRect();
-            
-            // Only track if mouse is over header
-            if (e.clientY > headerRect.bottom) return;
-            
-            eyes.forEach(eye => {
-                const rect = eye.getBoundingClientRect();
-                const eyeCenterX = rect.left + rect.width / 2;
-                const eyeCenterY = rect.top + rect.height / 2;
-                
-                const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
-                const distance = Math.min(2, Math.sqrt(
-                    Math.pow(e.clientX - eyeCenterX, 2) + 
-                    Math.pow(e.clientY - eyeCenterY, 2)
-                ) / 50);
-                
-                const pupilX = Math.cos(angle) * distance;
-                const pupilY = Math.sin(angle) * distance;
-                
-                const beforeElement = eye.querySelector('::before');
-                if (eye.style) {
-                    eye.style.setProperty('--pupil-x', pupilX + 'px');
-                    eye.style.setProperty('--pupil-y', pupilY + 'px');
-                }
-            });
-        }
-
-        // Add mouse tracking
-        document.addEventListener('mousemove', trackMouse);
-
-
-
-        // Cat walking behavior
-        let isWalking = false;
-        let walkDirection = 1; // 1 for right, -1 for left
-        let currentPosition = 0; // Will be set properly on load
-        let catWidth = 100; // Updated cat width to match new size
-        let hasPassedCenter = false; // Track if cat has passed center since last turn
+        // 儲存原始的 Mermaid 程式碼
+        const mermaidCodes = {};
         
-        let leftBound = 0;
-        let rightBound = 0;
-
-        function updateBounds() {
-            const header = document.querySelector('.header');
-            const panel = document.getElementById('diagram1');
-            const vw = panel.clientWidth; //header ? header.clientWidth : window.innerWidth;
-            if (!panel || panel.clientWidth === 0) {
-                leftBound = vw * 0.1;
-                rightBound = vw * 0.9 - catWidth;
-                return;
-            }
-            const headerRect = header.getBoundingClientRect();
-            const panelRect = panel.getBoundingClientRect();
-            const relativeLeft = panelRect.left - headerRect.left;
-            leftBound = relativeLeft + (panelRect.width * 0.1);
-            rightBound = relativeLeft + (panelRect.width * 0.9) - catWidth;
-            // Ensure bounds are valid
-            if (leftBound >= rightBound) {
-                leftBound = vw * 0.1;
-                rightBound = vw * 0.9 - catWidth;
-            }
-        }
-
-        // Initialize cat position
-        window.addEventListener('load', () => {
-            updateBounds();
-            const catContainer = document.querySelector('.running-cat-container');
-            if (catContainer) {
-                currentPosition = leftBound;
-                catContainer.style.left = currentPosition + 'px';
-                catContainer.style.display = 'block';
+        // 先儲存當前 DOM 中的 Mermaid 程式碼
+        document.querySelectorAll('.mermaid').forEach(element => {
+            if (element.id && element.textContent.trim()) {
+                mermaidCodes[element.id] = element.textContent.trim();
             }
         });
         
-        function walk(rightBound, leftBound) {
-
-            return;
-
-            console.log(rightBound, leftBound, currentPosition);
-
-            if (!isWalking) return;
-
-            // Calculate step size (2-3% of walking area width)
-            const walkingWidth = rightBound - leftBound;
-            const stepPercent = 0.02 + Math.random() * 0.01;
-            const stepSize = Math.floor(walkingWidth * stepPercent) || 10; // Fallback min step
+        // 將 mermaidCodes 設為全域變數供全螢幕功能使用
+        window.mermaidCodes = mermaidCodes;
+        
+        // Load and render diagrams
+        Promise.all([
+            fetch('diagram1.mmd').then(r => r.text()),
+            fetch('diagram2.mmd').then(r => r.text())
+        ]).then(([diagram1Code, diagram2Code]) => {
+            // 更新儲存的原始程式碼
+            mermaidCodes['diagram1'] = diagram1Code;
+            mermaidCodes['diagram2'] = diagram2Code;
             
-            // Calculate new position
-            let newPosition = currentPosition + (walkDirection * stepSize);
+            // Render first diagram
+            document.getElementById('diagram1').textContent = diagram1Code;
             
-            // Define boundaries
-            // Already in leftBound and rightBound
+            // Render second diagram
+            document.getElementById('diagram2').textContent = diagram2Code;
+
+            // Run mermaid
+            mermaid.run();
+        }).catch(error => {
+            console.error('Error loading external diagrams, using embedded code:', error);
             
-            if (newPosition < leftBound) {
-                walkDirection = 1;
-                updateCatDirection();
-                newPosition = leftBound + stepSize;
-                hasPassedCenter = false;
-            } else if (newPosition > rightBound) {
-                walkDirection = -1;
-                updateCatDirection();
-                newPosition = rightBound - stepSize;
-                hasPassedCenter = false;
-            } else {
-                const middle = (leftBound + rightBound) / 2;
-                const crossingCenter = (walkDirection * (newPosition - middle)) < 0;
-                
-                if (crossingCenter && !hasPassedCenter) {
-                    hasPassedCenter = true;
+            // 直接使用已經儲存的內嵌程式碼
+            mermaid.run();
+        });
+
+        // 滾動動畫
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
                 }
-                
-                // Only allow turning if we haven't turned since passing center
-                if (!hasPassedCenter) {
-                    // Turn probability: f(x) = 2*|x|/L
-                    // At center (x=0): f(0) = 0
-                    // At edges (x=±L/2): f(±L/2) = 2*(L/2)/L = 1
-                    const turnProbability = 2 * Math.abs(newPosition - middle) / (rightBound - leftBound);
-                    
-                    if (Math.random() < turnProbability) {
-                        // Turn based on probability
-                        walkDirection *= -1;
-                        updateCatDirection();
-                        newPosition = currentPosition + (walkDirection * stepSize);
-                        hasPassedCenter = false; // Will be set true when actually crossing
-                    }
-                }
-            }
-            
-            currentPosition = Math.max(leftBound, Math.min(rightBound, newPosition));
-            catContainer.style.left = currentPosition + 'px';
-            
-            // Create paw prints
-            if (Math.random() > 0.5) {
-                createPawPrint(currentPosition + catWidth/2, catContainer.offsetTop + catContainer.offsetHeight - 5);
-            }
-            
-            requestAnimationFrame(() => {
-                setTimeout(() => {
-                    if (isWalking) walk(rightBound, leftBound);
-                }, 100);
             });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-animate').forEach(el => {
+            observer.observe(el);
+        });
+
+        // 平滑滾動
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 導航列滾動效果
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.15)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+            }
+            
+            lastScroll = currentScroll;
+        });
+
+        // 全螢幕檢視功能
+        function toggleExpand(button) {
+            const card = button.closest('.diagram-card');
+            const title = card.querySelector('.card-title').textContent.trim();
+            const diagramId = card.querySelector('.mermaid').id;
+            
+            // 創建全螢幕覆蓋層
+            let overlay = document.getElementById('fullscreen-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'fullscreen-overlay';
+                overlay.className = 'fullscreen-overlay';
+                overlay.innerHTML = `
+                    <div class="fullscreen-content">
+                        <div class="fullscreen-header">
+                            <h2 class="fullscreen-title">${title}</h2>
+                            <button class="close-button" onclick="closeFullscreen()">✕</button>
+                        </div>
+                        <div class="fullscreen-diagram">
+                            <div class="mermaid-wrapper">
+                                <pre class="mermaid" id="fullscreen-${diagramId}"></pre>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            } else {
+                overlay.querySelector('.fullscreen-title').textContent = title;
+                const fullscreenDiagram = overlay.querySelector('.fullscreen-diagram .mermaid');
+                fullscreenDiagram.id = `fullscreen-${diagramId}`;
+                fullscreenDiagram.innerHTML = '';
+                fullscreenDiagram.removeAttribute('data-processed');
+            }
+            
+            // 顯示覆蓋層
+            overlay.classList.add('active');
+            
+            // 使用原始的 Mermaid 程式碼重新渲染
+            const fullscreenDiagram = overlay.querySelector('.fullscreen-diagram .mermaid');
+            
+            // 檢查是否有儲存的原始程式碼
+            if (window.mermaidCodes && window.mermaidCodes[diagramId]) {
+                fullscreenDiagram.textContent = window.mermaidCodes[diagramId];
+            } else {
+                // 如果沒有儲存的程式碼，嘗試從 DOM 取得（這是備用方案）
+                const originalDiagram = document.getElementById(diagramId);
+                if (originalDiagram.querySelector('svg')) {
+                    // 如果已經渲染成 SVG，顯示錯誤訊息
+                    fullscreenDiagram.innerHTML = `
+                        <div style="color: #e53e3e; padding: 2rem; text-align: center;">
+                            <h3>無法顯示圖表</h3>
+                            <p>請重新載入頁面後再試</p>
+                        </div>
+                    `;
+                    return;
+                } else {
+                    fullscreenDiagram.textContent = originalDiagram.textContent;
+                }
+            }
+            
+            // 重新初始化並運行 Mermaid
+            mermaid.init(undefined, fullscreenDiagram);
+            
+            // 防止背景滾動
+            document.body.style.overflow = 'hidden';
         }
         
-        function updateCatDirection() {
-            const catElement = document.querySelector('.running-cat');
-            
-            if (walkDirection === -1) {
-                // Walking left - flip horizontally
-                catElement.style.transform = 'scaleX(-1)';
-            } else {
-                // Walking right - normal
-                catElement.style.transform = 'scaleX(1)';
+        function closeFullscreen() {
+            const overlay = document.getElementById('fullscreen-overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
             }
         }
         
-        function startWalking() {
-            if (isWalking) return;
-            isWalking = true;
-            
+        // ESC 鍵關閉全螢幕
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeFullscreen();
+            }
+        });
+        
+        // 點擊背景關閉全螢幕
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('fullscreen-overlay')) {
+                closeFullscreen();
+            }
+        });
+
+        // 頁面載入完成後的動畫效果
+        window.addEventListener('load', () => {
             const catContainer = document.querySelector('.running-cat-container');
             const catBody = document.querySelector('.cat-body');
             const catHead = document.querySelector('.cat-head');
-            const catEars = document.querySelectorAll('.cat-ear-left, .cat-ear-right');
             
-            // Make sure cat is visible
-            catContainer.style.display = 'block';
-            
-            catContainer.classList.add('walking');
+            // 啟動行走動畫
             catBody.classList.add('walking');
             catHead.classList.add('walking');
-            catEars.forEach(ear => ear.classList.add('walking'));
+            catContainer.classList.add('walking');
             
-            updateBounds();
-            
-            if (currentPosition < leftBound || currentPosition > rightBound) {
-                currentPosition = leftBound;
-                catContainer.style.left = currentPosition + 'px';
-            }
-            
-            walkDirection = 1;
-            updateCatDirection();
-            
-            walk(rightBound, leftBound);
-        }
-        
-        function stopWalking() {
-            isWalking = false;
-            const catContainer = document.querySelector('.running-cat-container');
-            const catBody = document.querySelector('.cat-body');
-            const catHead = document.querySelector('.cat-head');
-            const catEars = document.querySelectorAll('.cat-ear-left, .cat-ear-right');
-            
-            catContainer.classList.remove('walking');
-            catBody.classList.remove('walking');
-            catHead.classList.remove('walking');
-            catEars.forEach(ear => ear.classList.remove('walking'));
-        }
-        
-        // Start walking after page fully loads
-        window.addEventListener('load', () => {
+            // 初始進場動畫
             setTimeout(() => {
-                startWalking();
-            }, 500);
-        });
-        
-        // Randomly pause and resume for more natural behavior
-        setInterval(() => {
-            if (isWalking && Math.random() > 0.6) { // 40% chance to stop
-                stopWalking();
+                const speechBubble = document.getElementById('catSpeech');
+                speechBubble.style.opacity = '1';
+                speechBubble.textContent = '喵~ 歡迎來到 TeamSync! 🎀';
                 
-                // Add idle animations
-                const catBody = document.querySelector('.cat-body');
-                const catTail = document.querySelector('.cat-tail');
-                catBody.classList.add('idle');
-                catTail.classList.add('idle');
-                
-                // Random idle duration
-                const idleDuration = Math.random() * 4000 + 2000; // 2-6 seconds
+                const rect = catContainer.getBoundingClientRect();
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        createHeart(
+                            rect.left + rect.width / 2 + (Math.random() - 0.5) * 60,
+                            rect.top + rect.height / 2
+                        );
+                    }, i * 100);
+                }
                 
                 setTimeout(() => {
-                    catBody.classList.remove('idle');
-                    catTail.classList.remove('idle');
-                    if (!isWalking && Math.random() > 0.3) { // 70% chance to resume walking
-                        startWalking();
-                    }
-                }, idleDuration);
-            } else if (!isWalking && Math.random() > 0.5) { // 50% chance to start walking if idle
-                startWalking();
-            }
-        }, 3000); // Check every 3 seconds
-        
-        // Add hover effect for cat
-        const catContainer = document.querySelector('.running-cat-container');
-        catContainer.addEventListener('mouseenter', () => {
-            stopWalking();
-            const speechBubble = document.getElementById('catSpeech');
-            speechBubble.style.opacity = '1';
-            speechBubble.style.transform = 'scale(1.1)';
-            
-            // Create small hearts on hover
-            const rect = catContainer.getBoundingClientRect();
-            createHeart(rect.left + rect.width / 2, rect.top);
-        });
-        
-        catContainer.addEventListener('mouseleave', () => {
-            const speechBubble = document.getElementById('catSpeech');
-            speechBubble.style.opacity = '0';
-            speechBubble.style.transform = 'scale(1)';
-            
-            // Resume walking after a short delay
-            setTimeout(() => {
-                if (!isWalking) {
-                    startWalking();
-                }
-            }, 1000);
+                    speechBubble.style.opacity = '0';
+                }, 3000);
+            }, 2000);
         });
 
-        // Add continuous sparkle effect
+        // 持續的閃光效果
         setInterval(() => {
+            const catContainer = document.querySelector('.running-cat-container');
             if (Math.random() > 0.8) {
                 const rect = catContainer.getBoundingClientRect();
                 createSparkle(
@@ -1273,88 +1836,17 @@
             }
         }, 3000);
 
-        // Add rainbow glow on special occasions
+        // 彩虹光暈效果
         let glowIndex = 0;
         const glowColors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'];
         
         setInterval(() => {
-            if (messageIndex === 0 || messageIndex === 9) { // Special messages
+            if (messageIndex === 0 || messageIndex === 9) {
                 const catBody = document.querySelector('.cat-body');
                 catBody.style.boxShadow = `0 0 20px ${glowColors[glowIndex]}`;
                 glowIndex = (glowIndex + 1) % glowColors.length;
             }
         }, 800);
-
-        // Initial cute entrance animation
-        window.addEventListener('load', () => {
-            const catContainer = document.querySelector('.running-cat-container');
-            catContainer.style.opacity = '0';
-            catContainer.style.transform = 'scale(0)';
-            
-            setTimeout(() => {
-                catContainer.style.transition = 'all 1s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
-                catContainer.style.opacity = '1';
-                catContainer.style.transform = 'scale(1) rotate(360deg)';
-                
-                // Welcome message
-                setTimeout(() => {
-                    const speechBubble = document.getElementById('catSpeech');
-                    speechBubble.style.opacity = '1';
-                    speechBubble.textContent = '喵~ 歡迎來到 TeamSync! 🎀';
-                    
-                    // Create entrance hearts
-                    const rect = catContainer.getBoundingClientRect();
-                    for (let i = 0; i < 5; i++) {
-                        setTimeout(() => {
-                            createHeart(
-                                rect.left + rect.width / 2 + (Math.random() - 0.5) * 60,
-                                rect.top + rect.height / 2
-                            );
-                        }, i * 100);
-                    }
-                    
-                    setTimeout(() => {
-                        speechBubble.style.opacity = '0';
-                    }, 3000);
-                }, 1000);
-            }, 500);
-        });
-
-        // Load and render diagrams
-        Promise.all([
-            fetch('diagram1.mmd').then(r => r.text()),
-            fetch('diagram2.mmd').then(r => r.text())
-        ]).then(([diagram1Code, diagram2Code]) => {
-            // Render first diagram
-            document.getElementById('diagram1').textContent = diagram1Code;
-            
-            // Render second diagram
-            document.getElementById('diagram2').textContent = diagram2Code;
-
-            // Run mermaid
-            mermaid.run();
-            setTimeout(updateBounds, 500); // Give time for rendering
-        }).catch(error => {
-            console.error('Error loading diagrams:', error);
-            document.querySelector('.markdown-body').innerHTML += `
-                <div style="color: red; margin: 20px 0;">
-                    <h3>Error loading diagrams</h3>
-                    <p>Please make sure diagram1.mmd and diagram2.mmd files exist.</p>
-                    <pre>${error}</pre>
-                </div>
-            `;
-        });
-
-        // Add resize handler to clamp position
-        window.addEventListener('resize', () => {
-            updateBounds();
-            currentPosition = Math.max(leftBound, Math.min(rightBound, currentPosition));
-            
-            const catContainer = document.querySelector('.running-cat-container');
-            if (catContainer) {
-                catContainer.style.left = currentPosition + 'px';
-            }
-        });
     </script>
 </body>
-</html> 
+</html>
