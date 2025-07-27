@@ -1063,7 +1063,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 2000;
             display: none;
             align-items: center;
@@ -1123,19 +1123,13 @@
 
         .fullscreen-diagram {
             flex: 1;
-            padding: 2rem;
+            padding: 1rem;
             overflow: auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #f8f9fa;
-        }
-
-        .fullscreen-diagram svg {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto !important;
-            height: auto !important;
+            background: #ffffff;
+            position: relative;
         }
 
         .mermaid-wrapper {
@@ -1144,31 +1138,138 @@
             overflow: auto;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            padding: 0;
+            position: relative;
+        }
+
+        /* 全螢幕 SVG 容器樣式 */
+        #fullscreen-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
             align-items: center;
-            padding: 2rem;
+            overflow: auto;
+        }
+
+        #fullscreen-wrapper {
+            cursor: grab;
+        }
+        
+        #fullscreen-wrapper:active {
+            cursor: grabbing;
+        }
+        
+        #fullscreen-wrapper svg {
+            display: block;
+            margin: auto;
+            transition: transform 0.3s ease;
+            pointer-events: all;
+            background: white !important;
+        }
+        
+        /* 確保 Mermaid SVG 元素有白色背景 */
+        .mermaid svg {
+            background: white !important;
+        }
+        
+        /* 修正 Mermaid 圖表的文字和線條顏色 */
+        .mermaid .node rect,
+        .mermaid .node circle,
+        .mermaid .node ellipse,
+        .mermaid .node polygon,
+        .mermaid .node path {
+            fill: #e8f4ff !important;
+            stroke: #667eea !important;
+        }
+        
+        .mermaid .label {
+            color: #2d3748 !important;
+            fill: #2d3748 !important;
+        }
+        
+        .mermaid .edgePath .path {
+            stroke: #4a5568 !important;
         }
 
         /* 確保 Mermaid 圖表在全螢幕時正確顯示 */
         #fullscreen-overlay .mermaid {
-            max-width: 95vw;
-            max-height: 80vh;
-            overflow: visible;
             background: transparent;
             border: none;
             padding: 0;
             margin: 0;
+            width: 100%;
+            height: 100%;
         }
 
-        #fullscreen-overlay .mermaid svg {
-            max-width: 100%;
-            max-height: 100%;
+        /* 縮放控制按鈕 */
+        .zoom-controls {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            z-index: 10;
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f7fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-btn:hover {
+            background: var(--primary-gradient);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .zoom-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 全螢幕背景效果 */
+        .fullscreen-overlay.active .fullscreen-content {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
         
-        .fullscreen-diagram pre.mermaid {
-            background: transparent;
-            border: none;
-            margin: 0;
-            padding: 0;
+        .loading {
+            color: #667eea;
+            font-size: 1.25rem;
+            text-align: center;
+            padding: 3rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
 
         @media (max-width: 768px) {
@@ -1492,7 +1593,7 @@ sequenceDiagram
         // Initialize mermaid with modern theme
         mermaid.initialize({ 
             startOnLoad: false,
-            theme: 'base',
+            theme: 'default',
             themeVariables: {
                 primaryColor: '#e8f4ff',
                 primaryTextColor: '#2d3748',
@@ -1521,9 +1622,27 @@ sequenceDiagram
                 actorTextColor: '#2d3748',
                 signalTextColor: '#2d3748',
                 noteBkgColor: '#fffacd',
-                noteTextColor: '#2d3748'
+                noteTextColor: '#2d3748',
+                // 額外的顏色設定確保不會出現黑色
+                nodeBkg: '#e8f4ff',
+                nodeTextColor: '#2d3748',
+                clusterBkg: '#f7fafc',
+                clusterBorder: '#667eea',
+                defaultLinkColor: '#4a5568'
             },
-            securityLevel: 'loose' // 允許更靈活的渲染
+            securityLevel: 'loose', // 允許更靈活的渲染
+            suppressErrors: true,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                nodeSpacing: 50,
+                rankSpacing: 50,
+                curve: 'basis'
+            },
+            sequence: {
+                useMaxWidth: true,
+                showSequenceNumbers: false
+            }
         });
 
         // 貓咪說話訊息
@@ -1622,7 +1741,10 @@ sequenceDiagram
         // 先儲存當前 DOM 中的 Mermaid 程式碼
         document.querySelectorAll('.mermaid').forEach(element => {
             if (element.id && element.textContent.trim()) {
-                mermaidCodes[element.id] = element.textContent.trim();
+                const code = element.textContent.trim();
+                mermaidCodes[element.id] = code;
+                // 同時保存為 data attribute
+                element.setAttribute('data-original-code', code);
             }
         });
         
@@ -1639,18 +1761,26 @@ sequenceDiagram
             mermaidCodes['diagram2'] = diagram2Code;
             
             // Render first diagram
-            document.getElementById('diagram1').textContent = diagram1Code;
+            const diagram1El = document.getElementById('diagram1');
+            diagram1El.textContent = diagram1Code;
+            diagram1El.setAttribute('data-original-code', diagram1Code);
             
             // Render second diagram
-            document.getElementById('diagram2').textContent = diagram2Code;
+            const diagram2El = document.getElementById('diagram2');
+            diagram2El.textContent = diagram2Code;
+            diagram2El.setAttribute('data-original-code', diagram2Code);
 
-            // Run mermaid
-            mermaid.run();
+            // Run mermaid using modern API
+            mermaid.run({
+                querySelector: '.mermaid'
+            });
         }).catch(error => {
             console.error('Error loading external diagrams, using embedded code:', error);
             
             // 直接使用已經儲存的內嵌程式碼
-            mermaid.run();
+            mermaid.run({
+                querySelector: '.mermaid'
+            });
         });
 
         // 滾動動畫
@@ -1702,71 +1832,78 @@ sequenceDiagram
             lastScroll = currentScroll;
         });
 
-        // 全螢幕檢視功能
+        // 全螢幕檢視功能 - 使用 localStorage 傳遞數據
         function toggleExpand(button) {
             const card = button.closest('.diagram-card');
             const title = card.querySelector('.card-title').textContent.trim();
-            const diagramId = card.querySelector('.mermaid').id;
+            const originalDiagram = card.querySelector('.mermaid');
+            
+            // 取得原始 Mermaid 程式碼
+            const mermaidCode = window.mermaidCodes?.[originalDiagram.id] || 
+                              originalDiagram.getAttribute('data-original-code') ||
+                              originalDiagram.textContent;
+            
+            if (!mermaidCode || mermaidCode.includes('<svg')) {
+                alert('無法取得圖表資料，請重新載入頁面後再試。');
+                return;
+            }
+            
+            // 使用 localStorage 儲存數據
+            const diagramData = {
+                code: mermaidCode,
+                title: title,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('fullscreen-diagram', JSON.stringify(diagramData));
+            
+            // 開啟新視窗，不帶參數
+            const fullscreenUrl = 'fullscreen.html';
+            const newWindow = window.open(fullscreenUrl, 'fullscreen-diagram', 
+                'width=1200,height=800,menubar=no,toolbar=no,location=no,status=no');
+            
+            if (!newWindow) {
+                // 如果被瀏覽器阻擋，使用覆蓋層方式
+                showFullscreenOverlay(title, mermaidCode);
+            }
+        }
+        
+        // 覆蓋層方式的全螢幕檢視（備用方案）
+        function showFullscreenOverlay(title, mermaidCode) {
+            // 移除舊的覆蓋層
+            const existingOverlay = document.getElementById('fullscreen-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
+            
+            // 使用 localStorage 儲存數據
+            const diagramData = {
+                code: mermaidCode,
+                title: title,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('fullscreen-diagram', JSON.stringify(diagramData));
             
             // 創建全螢幕覆蓋層
-            let overlay = document.getElementById('fullscreen-overlay');
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.id = 'fullscreen-overlay';
-                overlay.className = 'fullscreen-overlay';
-                overlay.innerHTML = `
-                    <div class="fullscreen-content">
-                        <div class="fullscreen-header">
-                            <h2 class="fullscreen-title">${title}</h2>
-                            <button class="close-button" onclick="closeFullscreen()">✕</button>
-                        </div>
-                        <div class="fullscreen-diagram">
-                            <div class="mermaid-wrapper">
-                                <pre class="mermaid" id="fullscreen-${diagramId}"></pre>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(overlay);
-            } else {
-                overlay.querySelector('.fullscreen-title').textContent = title;
-                const fullscreenDiagram = overlay.querySelector('.fullscreen-diagram .mermaid');
-                fullscreenDiagram.id = `fullscreen-${diagramId}`;
-                fullscreenDiagram.innerHTML = '';
-                fullscreenDiagram.removeAttribute('data-processed');
-            }
+            const overlay = document.createElement('div');
+            overlay.id = 'fullscreen-overlay';
+            overlay.className = 'fullscreen-overlay active';
             
-            // 顯示覆蓋層
-            overlay.classList.add('active');
+            overlay.innerHTML = '<div class="fullscreen-content">' +
+                '<div class="fullscreen-header">' +
+                    '<h2 class="fullscreen-title">' + title + '</h2>' +
+                    '<button class="close-button" onclick="closeFullscreen()">✕</button>' +
+                '</div>' +
+                '<div class="fullscreen-diagram">' +
+                    '<iframe id="diagram-iframe" style="width: 100%; height: 100%; border: none; background: white;"></iframe>' +
+                '</div>' +
+            '</div>';
             
-            // 使用原始的 Mermaid 程式碼重新渲染
-            const fullscreenDiagram = overlay.querySelector('.fullscreen-diagram .mermaid');
-            
-            // 檢查是否有儲存的原始程式碼
-            if (window.mermaidCodes && window.mermaidCodes[diagramId]) {
-                fullscreenDiagram.textContent = window.mermaidCodes[diagramId];
-            } else {
-                // 如果沒有儲存的程式碼，嘗試從 DOM 取得（這是備用方案）
-                const originalDiagram = document.getElementById(diagramId);
-                if (originalDiagram.querySelector('svg')) {
-                    // 如果已經渲染成 SVG，顯示錯誤訊息
-                    fullscreenDiagram.innerHTML = `
-                        <div style="color: #e53e3e; padding: 2rem; text-align: center;">
-                            <h3>無法顯示圖表</h3>
-                            <p>請重新載入頁面後再試</p>
-                        </div>
-                    `;
-                    return;
-                } else {
-                    fullscreenDiagram.textContent = originalDiagram.textContent;
-                }
-            }
-            
-            // 重新初始化並運行 Mermaid
-            mermaid.init(undefined, fullscreenDiagram);
-            
-            // 防止背景滾動
+            document.body.appendChild(overlay);
             document.body.style.overflow = 'hidden';
+            
+            // 設置 iframe 內容，不帶參數
+            const iframe = document.getElementById('diagram-iframe');
+            iframe.src = 'fullscreen.html';
         }
         
         function closeFullscreen() {
@@ -1774,8 +1911,13 @@ sequenceDiagram
             if (overlay) {
                 overlay.classList.remove('active');
                 document.body.style.overflow = '';
+                window.currentZoom = 1;
             }
         }
+        
+        // 注意：縮放控制功能已移至 fullscreen.html
+        
+        // 注意：拖曳功能已移至 fullscreen.html
         
         // ESC 鍵關閉全螢幕
         document.addEventListener('keydown', (e) => {

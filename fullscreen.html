@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamSync 圖表全螢幕檢視</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .close-button {
+            background: #f7fafc;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-button:hover {
+            background: #e2e8f0;
+            transform: rotate(90deg);
+        }
+
+        .diagram-container {
+            flex: 1;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        #diagram-wrapper {
+            transform-origin: center center;
+            transition: transform 0.3s ease;
+        }
+
+        .mermaid {
+            background: white !important;
+        }
+
+        .mermaid svg {
+            background: white !important;
+        }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f7fafc;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .zoom-btn:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .loading {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title" id="diagram-title">圖表檢視</h1>
+        <button class="close-button" onclick="closeWindow()">✕</button>
+    </div>
+    
+    <div class="diagram-container">
+        <div id="diagram-wrapper">
+            <div class="loading">載入中...</div>
+        </div>
+        
+        <div class="zoom-controls">
+            <button class="zoom-btn" onclick="zoomDiagram('in')" title="放大">➕</button>
+            <button class="zoom-btn" onclick="zoomDiagram('out')" title="縮小">➖</button>
+            <button class="zoom-btn" onclick="zoomDiagram('reset')" title="重置">🔄</button>
+            <button class="zoom-btn" onclick="zoomDiagram('fit')" title="適應螢幕">📐</button>
+        </div>
+    </div>
+
+    <script>
+        let currentZoom = 1;
+
+        // 初始化 Mermaid
+        mermaid.initialize({ 
+            startOnLoad: false,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#e8f4ff',
+                primaryBorderColor: '#667eea',
+                primaryTextColor: '#000000',
+                lineColor: '#333333',
+                background: '#ffffff',
+                mainBkg: '#e8f4ff',
+                nodeBkg: '#e8f4ff',
+                nodeTextColor: '#000000',
+                edgeLabelBackground: '#ffffff',
+                clusterBkg: '#f7fafc',
+                clusterBorder: '#667eea'
+            }
+        });
+
+        // 從 localStorage 獲取圖表資料
+        let diagramData = null;
+        try {
+            const storedData = localStorage.getItem('fullscreen-diagram');
+            if (storedData) {
+                diagramData = JSON.parse(storedData);
+                // 清理超過 5 分鐘的數據
+                if (Date.now() - diagramData.timestamp > 5 * 60 * 1000) {
+                    localStorage.removeItem('fullscreen-diagram');
+                    diagramData = null;
+                }
+            }
+        } catch (error) {
+            console.error('讀取 localStorage 失敗:', error);
+        }
+
+        // 如果沒有 localStorage 數據，嘗試從 URL 參數讀取（向後兼容）
+        if (!diagramData) {
+            const params = new URLSearchParams(window.location.search);
+            const code = params.get('code');
+            const title = params.get('title');
+            if (code) {
+                diagramData = {
+                    code: decodeURIComponent(code),
+                    title: title ? decodeURIComponent(title) : '圖表檢視'
+                };
+            }
+        }
+
+        // 設置標題
+        if (diagramData && diagramData.title) {
+            document.getElementById('diagram-title').textContent = diagramData.title;
+        }
+
+        // 渲染圖表
+        async function renderDiagram() {
+            if (!diagramData || !diagramData.code) {
+                document.getElementById('diagram-wrapper').innerHTML = 
+                    '<div style="color: #e53e3e;">無法載入圖表資料</div>';
+                return;
+            }
+
+            try {
+                const wrapper = document.getElementById('diagram-wrapper');
+                wrapper.innerHTML = '<pre class="mermaid" id="mermaid-diagram"></pre>';
+                
+                const element = document.getElementById('mermaid-diagram');
+                element.textContent = diagramData.code;
+                
+                await mermaid.run({
+                    nodes: [element]
+                });
+
+                // 自動適應螢幕
+                setTimeout(() => zoomDiagram('fit'), 100);
+            } catch (error) {
+                console.error('渲染錯誤:', error);
+                document.getElementById('diagram-wrapper').innerHTML = 
+                    '<div style="color: #e53e3e;">圖表渲染失敗: ' + error.message + '</div>';
+            }
+        }
+
+        // 關閉窗口
+        function closeWindow() {
+            localStorage.removeItem('fullscreen-diagram');
+            window.close();
+            // 如果 window.close() 不起作用（某些瀏覽器的限制），顯示提示
+            setTimeout(() => {
+                document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 1.5rem; color: #666;">請手動關閉此窗口</div>';
+            }, 100);
+        }
+        
+        // 縮放功能
+        function zoomDiagram(action) {
+            const wrapper = document.getElementById('diagram-wrapper');
+            const svg = wrapper.querySelector('svg');
+            if (!svg) return;
+
+            switch(action) {
+                case 'in':
+                    currentZoom = Math.min(currentZoom * 1.2, 5);
+                    break;
+                case 'out':
+                    currentZoom = Math.max(currentZoom * 0.8, 0.2);
+                    break;
+                case 'reset':
+                    currentZoom = 1;
+                    break;
+                case 'fit':
+                    const container = document.querySelector('.diagram-container');
+                    const box = svg.getBBox();
+                    const containerWidth = container.clientWidth - 80;
+                    const containerHeight = container.clientHeight - 80;
+                    const scaleX = containerWidth / box.width;
+                    const scaleY = containerHeight / box.height;
+                    currentZoom = Math.min(scaleX, scaleY, 1);
+                    break;
+            }
+
+            wrapper.style.transform = `scale(${currentZoom})`;
+        }
+
+        // 載入時渲染圖表
+        renderDiagram();
+        
+        // 窗口關閉時清理 localStorage
+        window.addEventListener('beforeunload', () => {
+            localStorage.removeItem('fullscreen-diagram');
+        });
+    </script>
+</body>
+</html> 
