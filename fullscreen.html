@@ -54,18 +54,40 @@
 
         .diagram-container {
             flex: 1;
-            background: white;
+            background: #f5f5f5;
+            overflow: auto;
+            position: relative;
+            cursor: grab;
+        }
+        
+        .diagram-container:active {
+            cursor: grabbing;
+        }
+        
+        .diagram-scroll-area {
+            position: relative;
+            width: 300vw;
+            height: 300vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: auto;
-            padding: 2rem;
-            position: relative;
+            background-image: 
+                linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
 
         #diagram-wrapper {
             transform-origin: center center;
             transition: transform 0.3s ease;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         .mermaid {
@@ -74,12 +96,14 @@
 
         .mermaid svg {
             background: white !important;
+            max-width: none !important;
+            height: auto !important;
         }
 
         .zoom-controls {
-            position: absolute;
+            position: fixed;
             bottom: 2rem;
-            right: 2rem;
+            left: 2rem;
             display: flex;
             gap: 0.5rem;
             background: rgba(255, 255, 255, 0.95);
@@ -88,6 +112,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.8);
+            z-index: 100;
         }
 
         .zoom-btn {
@@ -114,6 +139,20 @@
             color: #667eea;
             font-size: 1.5rem;
         }
+        
+        .hint {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            color: #4a5568;
+            font-size: 0.875rem;
+            z-index: 100;
+        }
     </style>
 </head>
 <body>
@@ -123,8 +162,10 @@
     </div>
     
     <div class="diagram-container">
-        <div id="diagram-wrapper">
-            <div class="loading">載入中...</div>
+        <div class="diagram-scroll-area">
+            <div id="diagram-wrapper">
+                <div class="loading">載入中...</div>
+            </div>
         </div>
         
         <div class="zoom-controls">
@@ -132,6 +173,10 @@
             <button class="zoom-btn" onclick="zoomDiagram('out')" title="縮小">➖</button>
             <button class="zoom-btn" onclick="zoomDiagram('reset')" title="重置">🔄</button>
             <button class="zoom-btn" onclick="zoomDiagram('fit')" title="適應螢幕">📐</button>
+        </div>
+        
+        <div class="hint">
+            💡 提示：拖曳移動圖表 | Ctrl/Cmd + 滾輪縮放
         </div>
     </div>
 
@@ -142,18 +187,31 @@
         mermaid.initialize({ 
             startOnLoad: false,
             theme: 'default',
+            securityLevel: 'loose',
             themeVariables: {
                 primaryColor: '#e8f4ff',
                 primaryBorderColor: '#667eea',
                 primaryTextColor: '#000000',
-                lineColor: '#333333',
+                lineColor: '#4a5568',
                 background: '#ffffff',
                 mainBkg: '#e8f4ff',
                 nodeBkg: '#e8f4ff',
                 nodeTextColor: '#000000',
                 edgeLabelBackground: '#ffffff',
                 clusterBkg: '#f7fafc',
-                clusterBorder: '#667eea'
+                clusterBorder: '#667eea',
+                // 確保所有文字和線條都清晰可見
+                labelTextColor: '#000000',
+                actorTextColor: '#000000',
+                signalTextColor: '#000000',
+                noteBkgColor: '#fffacd',
+                noteTextColor: '#000000'
+            },
+            flowchart: {
+                useMaxWidth: false,
+                htmlLabels: true,
+                nodeSpacing: 50,
+                rankSpacing: 50
             }
         });
 
@@ -210,8 +268,22 @@
                     nodes: [element]
                 });
 
-                // 自動適應螢幕
-                setTimeout(() => zoomDiagram('fit'), 100);
+                // 自動適應螢幕並啟用拖曳
+                setTimeout(() => {
+                    // 確保 SVG 完全渲染後再計算
+                    const svg = wrapper.querySelector('svg');
+                    if (svg) {
+                        // 設置 SVG 初始樣式
+                        svg.style.maxWidth = 'none';
+                        svg.style.height = 'auto';
+                        
+                        // 給予一些額外時間確保佈局完成
+                        setTimeout(() => {
+                            enableDragToScroll();
+                            zoomDiagram('fit');
+                        }, 200);
+                    }
+                }, 100);
             } catch (error) {
                 console.error('渲染錯誤:', error);
                 document.getElementById('diagram-wrapper').innerHTML = 
@@ -235,6 +307,8 @@
             const svg = wrapper.querySelector('svg');
             if (!svg) return;
 
+            const container = document.querySelector('.diagram-container');
+            
             switch(action) {
                 case 'in':
                     currentZoom = Math.min(currentZoom * 1.2, 5);
@@ -246,17 +320,121 @@
                     currentZoom = 1;
                     break;
                 case 'fit':
-                    const container = document.querySelector('.diagram-container');
-                    const box = svg.getBBox();
-                    const containerWidth = container.clientWidth - 80;
-                    const containerHeight = container.clientHeight - 80;
-                    const scaleX = containerWidth / box.width;
-                    const scaleY = containerHeight / box.height;
-                    currentZoom = Math.min(scaleX, scaleY, 1);
+                    // 取得 SVG 的實際尺寸
+                    const viewBox = svg.getAttribute('viewBox');
+                    let svgWidth, svgHeight;
+                    
+                    if (viewBox) {
+                        // 如果有 viewBox，使用 viewBox 的尺寸
+                        const [x, y, width, height] = viewBox.split(' ').map(Number);
+                        svgWidth = width;
+                        svgHeight = height;
+                    } else {
+                        // 否則使用 getBoundingClientRect
+                        const rect = svg.getBoundingClientRect();
+                        svgWidth = rect.width / currentZoom;
+                        svgHeight = rect.height / currentZoom;
+                    }
+                    
+                    const containerRect = container.getBoundingClientRect();
+                    const containerWidth = containerRect.width - 100; // 留一些邊距
+                    const containerHeight = containerRect.height - 100;
+                    
+                    const scaleX = containerWidth / svgWidth;
+                    const scaleY = containerHeight / svgHeight;
+                    
+                    // 選擇較小的縮放比例，確保整個圖表都能顯示
+                    // 設定合理的縮放範圍
+                    const optimalScale = Math.min(scaleX, scaleY);
+                    
+                    // 如果計算出的縮放太小（< 0.5），使用 0.8 作為初始值
+                    // 如果太大（> 2），限制在 2
+                    if (optimalScale < 0.5) {
+                        currentZoom = 0.8;
+                    } else if (optimalScale > 2) {
+                        currentZoom = 2;
+                    } else {
+                        currentZoom = optimalScale;
+                    }
+                    
+                    // 應用縮放並重置滾動位置到中心
+                    wrapper.style.transform = `scale(${currentZoom})`;
+                    setTimeout(() => {
+                        // 確保滾動到中心位置
+                        const scrollArea = document.querySelector('.diagram-scroll-area');
+                        const containerRect = container.getBoundingClientRect();
+                        const wrapperRect = wrapper.getBoundingClientRect();
+                        
+                        // 計算需要滾動的位置，使圖表居中顯示
+                        const scrollLeft = (scrollArea.scrollWidth - containerRect.width) / 2;
+                        const scrollTop = (scrollArea.scrollHeight - containerRect.height) / 2;
+                        
+                        container.scrollLeft = scrollLeft;
+                        container.scrollTop = scrollTop;
+                    }, 50);
                     break;
             }
 
+            // 更新 transform
             wrapper.style.transform = `scale(${currentZoom})`;
+        }
+        
+        // 添加拖曳功能
+        function enableDragToScroll() {
+            const container = document.querySelector('.diagram-container');
+            let isDown = false;
+            let startX;
+            let startY;
+            let scrollLeft;
+            let scrollTop;
+            
+            container.addEventListener('mousedown', (e) => {
+                // 避免在點擊按鈕時觸發拖曳
+                if (e.target.closest('.zoom-controls')) return;
+                
+                isDown = true;
+                container.style.cursor = 'grabbing';
+                startX = e.pageX - container.offsetLeft;
+                startY = e.pageY - container.offsetTop;
+                scrollLeft = container.scrollLeft;
+                scrollTop = container.scrollTop;
+                e.preventDefault();
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                isDown = false;
+                container.style.cursor = 'grab';
+            });
+            
+            container.addEventListener('mouseup', () => {
+                isDown = false;
+                container.style.cursor = 'grab';
+            });
+            
+            container.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - container.offsetLeft;
+                const y = e.pageY - container.offsetTop;
+                const walkX = (x - startX) * 1.5; // 增加拖曳靈敏度
+                const walkY = (y - startY) * 1.5;
+                container.scrollLeft = scrollLeft - walkX;
+                container.scrollTop = scrollTop - walkY;
+            });
+            
+            // 滑鼠滾輪縮放
+            container.addEventListener('wheel', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    
+                    // 執行縮放
+                    if (e.deltaY < 0) {
+                        zoomDiagram('in');
+                    } else {
+                        zoomDiagram('out');
+                    }
+                }
+            });
         }
 
         // 載入時渲染圖表
